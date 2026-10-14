@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Tính Doanh Thu Dự Kiến Sau Chiết Khấu - Sàn TMĐT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-body: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      --border-color: #e2e8f0;
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --primary-soft: #e0f2fe;
+      --success: #059669;
+      --success-soft: #ecfdf5;
+      --danger: #e11d48;
+      --danger-soft: #fff1f2;
+      --warning: #d97706;
+      --warning-soft: #fef3c7;
+      --purple: #7c3aed;
+      --purple-soft: #f5f3ff;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 16px 40px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 880px;
+      margin: 0 auto;
+    }
+
+    /* HEADER */
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .badge-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 14px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-size: 12.5px;
+      font-weight: 700;
+      border-radius: 9999px;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .header h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+
+    /* TAB SWITCHER */
+    .tab-nav {
+      display: flex;
+      background: #e2e8f0;
+      padding: 4px;
+      border-radius: 12px;
+      max-width: 440px;
+      margin: 0 auto 24px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 8px 14px;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .tab-btn.active {
+      background: #ffffff;
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* MAIN GRID (2 FRAMES EQUAL HEIGHT) */
+    .calculator-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+      align-items: stretch;
+    }
+
+    @media (min-width: 768px) {
+      .calculator-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      padding: 24px;
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: #cbd5e1;
+    }
+
+    .card-top {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+      white-space: nowrap;
+    }
+
+    .card-title .icon-box {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-title .icon-box img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* INPUT STYLING */
+    .input-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .input-wrapper {
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 15px 54px 15px 16px;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-main);
+      background: #f8fafc;
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-md);
+      outline: none;
+      transition: all 0.2s ease;
+      letter-spacing: -0.5px;
+    }
+
+    .input-field:focus {
+      background: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.12);
+    }
+
+    .currency-suffix {
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-light);
+      pointer-events: none;
+    }
+
+    .clear-btn {
+      position: absolute;
+      right: 48px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      color: var(--text-light);
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .clear-btn:hover {
+      background: #e2e8f0;
+      color: var(--text-main);
+    }
+
+    /* QUICK PRESET BUTTONS */
+    .quick-presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .preset-chip {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      padding: 6px 11px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .preset-chip:hover {
+      background: var(--primary-soft);
+      border-color: #bae6fd;
+      color: var(--primary);
+    }
+
+    /* VERTICAL FEE BADGE LIST (ANH 5 TRINH BAY DOC) */
+    .fee-badge-vertical {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: #f8fafc;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      border: 1px dashed var(--border-color);
+      margin-top: auto;
+    }
+
+    .fee-pill-row {
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 3px 0;
+    }
+
+    .fee-pill-row:not(:last-child) {
+      border-bottom: 1px dashed #e2e8f0;
+      padding-bottom: 7px;
+    }
+
+    .fee-pill-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .fee-pill-row strong {
+      color: var(--text-main);
+      font-weight: 700;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot.red { background: #dc2626; }
+    .dot.amber { background: #d97706; }
+    .dot.purple { background: #9333ea; }
+    .dot.blue { background: var(--primary); }
+
+    /* FRAME 2: RESULT CARD */
+    .result-card {
+      background: #ffffff;
+      border: 2px solid #e2e8f0;
+    }
+
+    .result-header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .result-amount-box {
+      background: var(--primary-soft);
+      border: 1px solid #bae6fd;
+      border-radius: var(--radius-md);
+      padding: 18px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .result-label {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .result-amount {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -1px;
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .result-amount .currency {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .result-percent-tag {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--primary);
+      margin-top: 3px;
+    }
+
+    /* PROGRESS BAR */
+    .mini-bar-container {
+      margin-bottom: 14px;
+    }
+
+    .mini-bar-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .bar-legend {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .progress-bar-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .progress-bar {
+      height: 11px;
+      width: 100%;
+      background: #e2e8f0;
+      border-radius: 9999px;
+      overflow: hidden;
+      display: flex;
+      cursor: pointer;
+    }
+
+    .bar-segment {
+      height: 100%;
+      transition: width 0.3s ease, filter 0.15s ease;
+      cursor: pointer;
+    }
+
+    .bar-segment:hover {
+      filter: brightness(1.15);
+    }
+
+    .bar-net { background: var(--primary); }
+    .bar-fee { background: var(--danger); }
+    .bar-tax { background: var(--purple); }
+
+    /* TOOLTIP FOR PROGRESS BAR */
+    .bar-tooltip {
+      position: absolute;
+      bottom: calc(100% + 7px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      color: #ffffff;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+      z-index: 30;
+    }
+
+    .bar-tooltip::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 5px;
+      border-style: solid;
+      border-color: #0f172a transparent transparent transparent;
+    }
+
+    .bar-tooltip.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(-2px);
+    }
+
+    /* SUMMARY STATS GRID */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .summary-box {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .summary-box-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .summary-box-value {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .summary-box-value.red { color: var(--danger); }
+    .summary-box-value.blue { color: var(--primary); }
+    .summary-box-value.purple { color: var(--purple); }
+
+    /* ACTION BUTTONS */
+    .action-row {
+      display: flex;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .btn-action {
+      flex: 1;
+      padding: 11px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background: #ffffff;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-action:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .btn-action.primary {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    .btn-action.primary:hover {
+      background: var(--primary-hover);
+    }
+
+    /* COLLAPSIBLE ACCORDION (PHAN TICH CHI TIET) */
+    .detail-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 20px;
+      transition: border-color 0.2s ease;
+    }
+
+    .detail-trigger {
+      width: 100%;
+      padding: 16px 22px;
+      background: transparent;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      transition: background-color 0.15s ease;
+    }
+
+    .detail-trigger:hover {
+      background: #f8fafc;
+    }
+
+    .detail-trigger-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .detail-icon-box {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .detail-icon-box img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .chevron-icon {
+      width: 20px;
+      height: 20px;
+      color: var(--text-muted);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .detail-card.open .chevron-icon {
+      transform: rotate(180deg);
+    }
+
+    .detail-content {
+      display: none;
+      padding: 0 24px 24px 24px;
+      border-top: 1px solid var(--border-color);
+      background: #ffffff;
+    }
+
+    .detail-card.open .detail-content {
+      display: block;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* DETAIL SECTION TABLES */
+    .step-section {
+      margin-top: 18px;
+    }
+
+    .step-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .step-num {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .step-num.green { background: var(--success); }
+    .step-num.purple { background: var(--purple); }
+
+    .breakdown-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 12px;
+      font-size: 13.5px;
+    }
+
+    .breakdown-table tr {
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .breakdown-table tr:last-child {
+      border-bottom: none;
+    }
+
+    .breakdown-table td {
+      padding: 9px 4px;
+    }
+
+    .breakdown-table .item-name {
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .breakdown-table .item-formula {
+      color: var(--text-muted);
+      font-size: 12px;
+      display: block;
+      margin-top: 2px;
+    }
+
+    .breakdown-table .item-val {
+      text-align: right;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .breakdown-table .item-val.deduct {
+      color: var(--danger);
+    }
+
+    .breakdown-table .item-val.tax {
+      color: var(--purple);
+    }
+
+    .subtotal-row {
+      background: #f8fafc;
+      font-weight: 700;
+    }
+
+    .subtotal-row td {
+      padding: 10px 8px !important;
+      border-radius: 6px;
+    }
+
+    .formula-banner {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid var(--primary);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-top: 14px;
+    }
+
+    .formula-banner code {
+      background: #e2e8f0;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    /* REVERSE CALCULATOR (TAB 2) */
+    .reverse-calc-box {
+      display: none;
+    }
+
+    .reverse-calc-box.active {
+      display: block;
+    }
+
+    .forward-calc-box.hidden {
+      display: none;
+    }
+
+    /* FOOTER */
+    .app-footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-light);
+      margin-top: auto;
+      line-height: 1.6;
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #0f172a;
+      color: #ffffff;
+      padding: 10px 20px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* WARNING ALERT */
+    .alert-box {
+      background: var(--warning-soft);
+      border: 1px solid #fde68a;
+      color: #92400e;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      display: none;
+      margin-bottom: 12px;
+    }
+
+    .alert-box.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- HEADER -->
+    <header class="header">
+      <div class="badge-tag">SÀN THƯƠNG MẠI ĐIỆN TỬ</div>
+      <h1>Tính Doanh Thu Dự Kiến Sau Chiết Khấu</h1>
+    </header>
+
+    <!-- TAB SWITCHER -->
+    <div class="tab-nav">
+      <button class="tab-btn active" id="tabForwardBtn" onclick="switchMode('forward')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        Tính Doanh Thu Thực Nhận
+      </button>
+      <button class="tab-btn" id="tabReverseBtn" onclick="switchMode('reverse')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Tính Giá Bán Cần Đặt
+      </button>
+    </div>
+
+    <!-- TAB 1: TÍNH XUÔI (NHẬP GIÁ BÁN -> DOANH THU THỰC NHẬN) -->
+    <div id="forwardMode" class="forward-calc-box">
+      <div class="calculator-grid">
+        <!-- KHUNG 1: NHẬP GIÁ BÁN BAN ĐẦU -->
+        <div class="card">
+          <div class="card-top">
+            <div class="card-header">
+              <div class="card-title">
+                <span class="icon-box">
+                  <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAADr0lEQVR4AeyYXU7bQBCAZ8bAA6rU3KDpQ9UkTymkEoKkCicoPUHpCZqeoOEEwAnKDYATEBpUoQIildqQt4QTkJc+hWQ7E2oa/LOx1z9QiZFHtte7M/OtvbuzJvjP5RHgvl/gvbyBbLGaEYUYJHWAfGmlNm8Nu/Mzw6vCYuUqXyrv5haW101ZUgWQ4BFoExAyIMJnBFwjsr7kFyvdXKn8GUJKagC5YjWLEjx4CyJkCbAuIC9eLxe9a7lLyV2UTAlao4MglgVkVlnnQd9GKgC5hco6osoGAbDrEL+NIBBkN0jyTARrYCDEEC950Ouaku5hXM8Q1FNTWxaPG92YIFPDababGVm7fv7SAVDwwy+AIOUysHk81L3qpgPAI9jLeZgyAvzoVZ+8CuMq416r8kp7oABqEF0yYs9pJjJAtljN5JaWsrbKgMsvrNQkcAI8QMAqxCSE6r3TFDkLdPfSA/nF8lahVD6XPKZQqijJaeh6tmvrLC9CSLSJMQZ+G9OIXJ1Btw81FzeBv+mS9Cgif4tYBM5jNE2SecTphtMwOQuc9wVOsGgcuAq1kjrtxHKP0AOHkOP+zq0kYMCrITwQUQifnKFoAdAaes69TiNJ3yNAn0CtXnxv7jl9aQF41D/71+Derg6HM4NXP0+PGl4RaAEUwM3GA5IXpdS2QrXNng5F5Vp6vX3arHaOj13fPtcZH1oArrHPmvyBsHNxdlS7ODmqScCicu3X65MBaQHmrme2uHKfNdFjZA02TB1oAVqtRh9wuMrG+6yJHPyZ7us+kWlOtQDSuH3yrZUkBOJwT/yY6lQAMZwkxACgBREkEIDYTwpiMJjznWHE7zQNDCCGkoDoyTgT44YaCkB8JAEhdk01NMDYkaK3fE5tkWNfvkdoAMlO4QEleKEANMGbrRMKIg1gYAkM4Bf8COGD6TqhEC45hkhHIABd8J2T5o7xwFYq0hog5FMBpgUvRkRNIPgNRFqFxa8WIGjwYkg0FARCr+OT44utoOoLEDZ422FQCM5AJUm0mxmfPQFMg7ejuIVAdM0y+Hd7GCUDtf3I2QWQH//Oxro8nFSZbWTATpbprgViZNEqyCwFILss3hzhxu8n1vMgGxWd7clnLgBQFv/3mawCEDZ4u3XnuNFryyzF20LeZa21T7/Wew3eY9gVYji7ABDVnRTBKPgYAgtqwgUAvAND+R2u4FIRvAvz2QR1Gmc9F4B8u7/OmsX2WTPr9R8mTudx2HIBxGE0TRuPAGn2tpevPwAAAP//AThhuwAAAAZJREFUAwBzJlFwAI1DZwAAAABJRU5ErkJggg==" alt="Ghim">
+                </span>
+                Giá Bán Ban Đầu
+              </div>
+              <span style="font-size: 11px; font-weight: 600; color: var(--text-light); text-transform: uppercase;">Giá niêm yết</span>
+            </div>
+
+            <label class="input-label" for="priceInput">Nhập giá sản phẩm niêm yết trên sàn:</label>
+            <div class="input-wrapper">
+              <input 
+                type="text" 
+                inputmode="numeric" 
+                id="priceInput" 
+                class="input-field" 
+                placeholder="0"
+                autocomplete="off"
+              >
+              <button class="clear-btn" id="clearBtn" title="Xoá">✕</button>
+              <span class="currency-suffix">₫</span>
+            </div>
+
+            <!-- Quick presets -->
+            <div class="quick-presets">
+              <button class="preset-chip" onclick="setPreset(50000)">+50k</button>
+              <button class="preset-chip" onclick="setPreset(100000)">100k</button>
+              <button class="preset-chip" onclick="setPreset(200000)">200k</button>
+              <button class="preset-chip" onclick="setPreset(350000)">350k</button>
+              <button class="preset-chip" onclick="setPreset(500000)">500k</button>
+              <button class="preset-chip" onclick="setPreset(1000000)">1 Triệu</button>
+            </div>
+
+            <!-- Alert if price too low -->
+            <div id="lowPriceAlert" class="alert-box">
+              ⚠️ Giá bán quá thấp (dưới 4.000₫), không đủ để bù trừ phụ phí dịch vụ cố định 3.000₫!
+            </div>
+          </div>
+
+          <!-- ANH 5: TRÌNH BÀY DỌC PHỤ PHÍ & THUẾ -->
+          <div class="fee-badge-vertical">
+            <div class="fee-pill-row">
+              <span class="fee-pill-left"><span class="dot red"></span> Phí cố định:</span>
+              <strong>16%</strong>
+            </div>
+            <div class="fee-pill-row">
+              <span class="fee-pill-left"><span class="dot amber"></span> Phí dịch vụ:</span>
+              <strong>3.000₫</strong>
+            </div>
+            <div class="fee-pill-row">
+              <span class="fee-pill-left"><span class="dot red"></span> Phí giao dịch:</span>
+              <strong>6%</strong>
+            </div>
+            <div class="fee-pill-row">
+              <span class="fee-pill-left"><span class="dot purple"></span> Thuế (GTGT+TNCN):</span>
+              <strong>1,5%</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- KHUNG 2: DOANH THU SAU CHIẾT KHẤU -->
+        <div class="card result-card">
+          <div class="card-top">
+            <div class="card-header">
+              <div class="card-title">
+                <span class="icon-box">
+                  <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAACh0lEQVR4AexYS27bMBB9QzqboAsfQVlVyaaC64WRD+DeID1BfYT0BIlPkNyg6QnSniBujRYG4qLdVPGu7gmaTVetpJCgLesb2nBCKoEGHGrGpDTzZmiNSIZHTjUA2wmsM1BnYM0IPP0l5HjdptvpOKZZ2sUSVJoB1+s62y8Pzjd58Iv93zDOm43gz/P23pEOQyGAHW/XYzz4ToQ3IDRhiTjYsc40y06QkY9448Km4wmftMHLASAenBBFTuIhQITfQv9kiIWZ5VseAEUvkreHoL7/bej442HXBCdtLyPnAADkIUGT8eeThFo5sQBA2kfX66SXU3rYuqYFQHzj0m3vd01xNiJzu47XLfxD6wEQHAa6NMXI0NxuWV1gmfmVVnlBXWCV9jjvXG4ZaQFEhPfiOaZqQJEdYb68aQFcXw17Jt7/ZTbKXVcjWgBqmuyryTUA23mpM3AfGZC7Paek0kJD1jOw094/lju+skqr8R/WAQAUf+3ygkoLDTHN+MMPE01jI4QbrEjWAYScvRI+ywr8EQheC3mlZh3AZDSYzqrwoX/19cdK3ovJ1gEIH9ZqNYC1wncPN+czoI5Q4kfLLV2sGBbc1kEvZZKweGNBUQ4AIfqghlTPQBdua7cngZjk7dbeESOcKi/ifhBLM4HNrvElYuF5rCihyRh/xwzui6UtYuwUmWPNkP/rK5cWPVuISpKvsgh4q7Tq9CGoPxmN9EtIunw9Hp5B3IAKEAE3MqBlB2y5DMx99sWJXNjgW4RQZkNWStMsKjP1/z7jWyqgc8/S11IActpEVMmf4y9nvqFz0YydQ18EcToY3Pl9dCcACaLq/DAADKKuARgMdqGpOgOFYTH446PPwC0AAAD//yXjd98AAAAGSURBVAMAfyFHf8MzQhwAAAAASUVORK5CYII=" alt="Ví tiền">
+                </span>
+                Doanh Thu Sau Khấu Trừ
+              </div>
+            </div>
+
+            <!-- Ô hiển thị số tiền thực nhận nổi bật -->
+            <div class="result-amount-box">
+              <div class="result-label">Doanh thu dự kiến về tài khoản</div>
+              <div class="result-amount">
+                <span id="netRevenue">0</span>
+                <span class="currency">₫</span>
+              </div>
+              <div class="result-percent-tag" id="percentSubtitle">Chưa có dữ liệu tính</div>
+            </div>
+
+            <!-- Thanh tỷ lệ trực quan (Progress Bar) -->
+            <div class="mini-bar-container">
+              <div class="mini-bar-label">
+                <span>Tỷ lệ phân bổ dòng tiền:</span>
+                <div class="bar-legend">
+                  <span class="legend-item"><span class="dot blue"></span> Nhận</span>
+                  <span class="legend-item"><span class="dot red"></span> Phí</span>
+                  <span class="legend-item"><span class="dot purple"></span> Thuế</span>
+                </div>
+              </div>
+              <div class="progress-bar-wrapper">
+                <div class="bar-tooltip" id="barTooltip">Nhận: 0%</div>
+                <div class="progress-bar" id="progressBar">
+                  <div class="bar-segment bar-net" id="barNet" style="width: 0%" data-name="Nhận"></div>
+                  <div class="bar-segment bar-fee" id="barFee" style="width: 0%" data-name="Phí"></div>
+                  <div class="bar-segment bar-tax" id="barTax" style="width: 0%" data-name="Thuế"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2 ô tóm tắt: Tổng Phí và Tổng Thuế -->
+            <div class="summary-grid">
+              <div class="summary-box">
+                <div class="summary-box-title">
+                  <span class="dot blue"></span> Tổng phụ phí sàn
+                </div>
+                <div class="summary-box-value blue" id="summaryTotalFee">0 ₫</div>
+              </div>
+              <div class="summary-box">
+                <div class="summary-box-title">
+                  <span class="dot blue"></span> Tổng thuế phải nộp
+                </div>
+                <div class="summary-box-value blue" id="summaryTotalTax">0 ₫</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nút bấm thao tác -->
+          <div class="action-row">
+            <button class="btn-action primary" onclick="copyResult()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+              Sao Chép Kết Quả
+            </button>
+            <button class="btn-action" onclick="resetAll()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              Làm Mới
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHẦN PHÂN TÍCH CHI TIẾT (ANH 4 & TEXT PHAN TICH CHI TIET) -->
+      <div class="detail-card" id="detailCard">
+        <button class="detail-trigger" onclick="toggleDetail()">
+          <div class="detail-trigger-left">
+            <span class="detail-icon-box">
+              <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAACBUlEQVR4AexZQU7CQBR9v4XEGBceoTuRjU1gQRSTcgLhBngCvQEcwRuIJzCegJIaN0ACieBSPYGsXFHrTML2Ty2xM0Xnhx/S+Zn57/03zXRmHOy4WQKmBbQKFFoBzw8OK42GZ9IlBiiMnULVerO3X4o/nHX51aRLDEf1s2uOA0sAoD4KYi6cHgfF4QKifSW8GD8Ci4UnQHGLEsyR4N2oAyMg7oAxlsBy/DRbTCN/OY08oz6JAomFwQ+WANehaO3/i4Cu9SCLyqkKVPzAO641b6q1c21rgswl/LbiN7w0MkoCVf/UJ/drSERXIBxCl8lchC655WEaCZaArHzilu6JktQqICcjgidJeH7AFo8lQG7cNwkeG5Mk9krr7J8SAvzJZgzjf6LKFxwIEeNC5HMR/e08FgUB/TC3yZiBwDbD59/HEsi/xuoMVgF1ffKPWgXyr7E6w64okH1PTECIglgCzDkorAIJ4Y7rpLudKB5wOVkCy3E0KIgKI7Gpz05AMi6v3Y5hEqPPA7ctsXDOKiA7zGbhajGJWiBciucH0nROJKevg6S1nETBWxiyL7DA9LNjFTmdxGBtXedEL+Oo+zx5DCXANFcqkNa5CPG/TcATm2ldZ0FcHokBCmMVsPcDiqplDbn2fsDkHQFg4H7gN+8UxGImPiVm3LRzuMCutFsCppWyCphW4BsAAP//yAEFLAAAAAZJREFUAwAfrvF/oOPgnAAAAABJRU5ErkJggg==" alt="Phân tích chi tiết">
+            </span>
+            <span>Phân tích chi tiết</span>
+          </div>
+          <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+
+        <div class="detail-content">
+          <!-- BƯỚC 1: PHỤ PHÍ SÀN -->
+          <div class="step-section">
+            <div class="step-title">
+              <span class="step-num">1</span>
+              Các khoản phụ phí sàn trừ vào giá ban đầu
+            </div>
+            <table class="breakdown-table">
+              <tr>
+                <td>
+                  <span class="item-name">Phí cố định</span>
+                  <span class="item-formula">16% × Giá bán ban đầu</span>
+                </td>
+                <td class="item-val deduct" id="detailFixedFee">0 ₫</td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="item-name">Phí dịch vụ cố định</span>
+                  <span class="item-formula">Khoản thu cố định mỗi đơn</span>
+                </td>
+                <td class="item-val deduct" id="detailServiceFee">3.000 ₫</td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="item-name">Phí xử lý giao dịch</span>
+                  <span class="item-formula">6% × Giá bán ban đầu</span>
+                </td>
+                <td class="item-val deduct" id="detailTxFee">0 ₫</td>
+              </tr>
+              <tr class="subtotal-row">
+                <td>Tổng phụ phí sàn (A)</td>
+                <td class="item-val deduct" id="detailTotalFee">0 ₫</td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- BƯỚC 2: DOANH THU TRƯỚC THUẾ (CƠ SỞ TÍNH THUẾ) -->
+          <div class="step-section">
+            <div class="step-title">
+              <span class="step-num">2</span>
+              Doanh thu trước thuế (Cơ sở để tính thuế)
+            </div>
+            <table class="breakdown-table">
+              <tr class="subtotal-row" style="background: #f0f9ff;">
+                <td>
+                  <span class="item-name">Doanh thu trước thuế (B = Giá bán - A)</span>
+                  <span class="item-formula">Khoản tiền còn lại sau khi sàn đã trừ toàn bộ phụ phí</span>
+                </td>
+                <td class="item-val" style="color: var(--primary);" id="detailBeforeTax">0 ₫</td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- BƯỚC 3: THUẾ -->
+          <div class="step-section">
+            <div class="step-title">
+              <span class="step-num purple">3</span>
+              Thuế phải nộp (Áp dụng sau khi trừ xong các phụ phí)
+            </div>
+            <table class="breakdown-table">
+              <tr>
+                <td>
+                  <span class="item-name">Thuế Giá Trị Gia Tăng (GTGT)</span>
+                  <span class="item-formula">1,0% × Doanh thu trước thuế (B)</span>
+                </td>
+                <td class="item-val tax" id="detailVat">0 ₫</td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="item-name">Thuế Thu Nhập Cá Nhân (TNCN / TTCN)</span>
+                  <span class="item-formula">0,5% × Doanh thu trước thuế (B)</span>
+                </td>
+                <td class="item-val tax" id="detailPit">0 ₫</td>
+              </tr>
+              <tr class="subtotal-row" style="background: var(--purple-soft);">
+                <td>Tổng thuế phải nộp (C = GTGT + TNCN)</td>
+                <td class="item-val tax" id="detailTotalTax">0 ₫</td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- BƯỚC 4: TỔNG KẾT THỰC NHẬN -->
+          <div class="step-section">
+            <div class="step-title">
+              <span class="step-num green">4</span>
+              Doanh thu thực nhận cuối cùng về ví
+            </div>
+            <table class="breakdown-table">
+              <tr class="subtotal-row" style="background: #ecfdf5; font-size: 15px;">
+                <td>
+                  <span class="item-name" style="color: #166534; font-weight: 800;">TIỀN THỰC VỀ TÀI KHOẢN (B - C)</span>
+                </td>
+                <td class="item-val" style="color: #15803d; font-size: 18px; font-weight: 800;" id="detailNet">0 ₫</td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- CÔNG THỨC TOÁN HỌC TÓM TẮT -->
+          <div class="formula-banner">
+            💡 <strong>Công thức tính rút gọn:</strong><br>
+            • <code>Doanh thu trước thuế</code> = Giá bán × 78% - 3.000₫<br>
+            • <code>Doanh thu thực nhận</code> = Doanh thu trước thuế × 98,5% (sau khi khấu trừ 1,5% thuế).
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: TÍNH NGƯỢC (TÍNH GIÁ CẦN BÁN KHI MUỐN NHẬN VỀ X ĐỒNG) -->
+    <div id="reverseMode" class="reverse-calc-box">
+      <div class="calculator-grid">
+        <div class="card">
+          <div class="card-top">
+            <div class="card-header">
+              <div class="card-title">
+                <span class="icon-box">
+                  <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAACh0lEQVR4AexYS27bMBB9QzqboAsfQVlVyaaC64WRD+DeID1BfYT0BIlPkNyg6QnSniBujRYG4qLdVPGu7gmaTVetpJCgLesb2nBCKoEGHGrGpDTzZmiNSIZHTjUA2wmsM1BnYM0IPP0l5HjdptvpOKZZ2sUSVJoB1+s62y8Pzjd58Iv93zDOm43gz/P23pEOQyGAHW/XYzz4ToQ3IDRhiTjYsc40y06QkY9448Km4wmftMHLASAenBBFTuIhQITfQv9kiIWZ5VseAEUvkreHoL7/bej442HXBCdtLyPnAADkIUGT8eeThFo5sQBA2kfX66SXU3rYuqYFQHzj0m3vd01xNiJzu47XLfxD6wEQHAa6NMXI0NxuWV1gmfmVVnlBXWCV9jjvXG4ZaQFEhPfiOaZqQJEdYb68aQFcXw17Jt7/ZTbKXVcjWgBqmuyryTUA23mpM3AfGZC7Paek0kJD1jOw094/lju+skqr8R/WAQAUf+3ygkoLDTHN+MMPE01jI4QbrEjWAYScvRI+ywr8EQheC3mlZh3AZDSYzqrwoX/19cdK3ovJ1gEIH9ZqNYC1wncPN+czoI5Q4kfLLV2sGBbc1kEvZZKweGNBUQ4AIfqghlTPQBdua7cngZjk7dbeESOcKi/ifhBLM4HNrvElYuF5rCihyRh/xwzui6UtYuwUmWPNkP/rK5cWPVuISpKvsgh4q7Tq9CGoPxmN9EtIunw9Hp5B3IAKEAE3MqBlB2y5DMx99sWJXNjgW4RQZkNWStMsKjP1/z7jWyqgc8/S11IActpEVMmf4y9nvqFz0YydQ18EcToY3Pl9dCcACaLq/DAADKKuARgMdqGpOgOFYTH446PPwC0AAAD//yXjd98AAAAGSURBVAMAfyFHf8MzQhwAAAAASUVORK5CYII=" alt="Ví tiền">
+                </span>
+                Số Tiền Muốn Nhận Về
+              </div>
+              <span style="font-size: 11px; font-weight: 600; color: var(--text-light); text-transform: uppercase;">Mục tiêu ví</span>
+            </div>
+
+            <label class="input-label" for="targetNetInput">Nhập số tiền thực tế bạn muốn nhận về tài khoản:</label>
+            <div class="input-wrapper">
+              <input 
+                type="text" 
+                inputmode="numeric" 
+                id="targetNetInput" 
+                class="input-field" 
+                placeholder="0"
+                autocomplete="off"
+              >
+              <span class="currency-suffix">₫</span>
+            </div>
+
+            <div class="quick-presets">
+              <button class="preset-chip" onclick="setReversePreset(50000)">50k</button>
+              <button class="preset-chip" onclick="setReversePreset(100000)">100k</button>
+              <button class="preset-chip" onclick="setReversePreset(200000)">200k</button>
+              <button class="preset-chip" onclick="setReversePreset(500000)">500k</button>
+              <button class="preset-chip" onclick="setReversePreset(1000000)">1 Tr</button>
+            </div>
+          </div>
+
+          <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.5; margin-top: auto;">
+            💡 Tính năng này giúp bạn biết cần đặt giá niêm yết bao nhiêu trên sàn để sau khi trừ hết 22% phí sàn, 3.000₫ phí dịch vụ và 1.5% thuế, bạn vẫn bỏ túi đúng số tiền mong muốn.
+          </p>
+        </div>
+
+        <div class="card result-card">
+          <div class="card-top">
+            <div class="card-header">
+              <div class="card-title">
+                <span class="icon-box">
+                  <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAADr0lEQVR4AeyYXU7bQBCAZ8bAA6rU3KDpQ9UkTymkEoKkCicoPUHpCZqeoOEEwAnKDYATEBpUoQIildqQt4QTkJc+hWQ7E2oa/LOx1z9QiZFHtte7M/OtvbuzJvjP5RHgvl/gvbyBbLGaEYUYJHWAfGmlNm8Nu/Mzw6vCYuUqXyrv5haW101ZUgWQ4BFoExAyIMJnBFwjsr7kFyvdXKn8GUJKagC5YjWLEjx4CyJkCbAuIC9eLxe9a7lLyV2UTAlao4MglgVkVlnnQd9GKgC5hco6osoGAbDrEL+NIBBkN0jyTARrYCDEEC950Ouaku5hXM8Q1FNTWxaPG92YIFPDababGVm7fv7SAVDwwy+AIOUysHk81L3qpgPAI9jLeZgyAvzoVZ+8CuMq416r8kp7oABqEF0yYs9pJjJAtljN5JaWsrbKgMsvrNQkcAI8QMAqxCSE6r3TFDkLdPfSA/nF8lahVD6XPKZQqijJaeh6tmvrLC9CSLSJMQZ+G9OIXJ1Btw81FzeBv+mS9Cgif4tYBM5jNE2SecTphtMwOQuc9wVOsGgcuAq1kjrtxHKP0AOHkOP+zq0kYMCrITwQUQifnKFoAdAaes69TiNJ3yNAn0CtXnxv7jl9aQF41D/71+Derg6HM4NXP0+PGl4RaAEUwM3GA5IXpdS2QrXNng5F5Vp6vX3arHaOj13fPtcZH1oArrHPmvyBsHNxdlS7ODmqScCicu3X65MBaQHmrme2uHKfNdFjZA02TB1oAVqtRh9wuMrG+6yJHPyZ7us+kWlOtQDSuH3yrZUkBOJwT/yY6lQAMZwkxACgBREkEIDYTwpiMJjznWHE7zQNDCCGkoDoyTgT44YaCkB8JAEhdk01NMDYkaK3fE5tkWNfvkdoAMlO4QEleKEANMGbrRMKIg1gYAkM4Bf8COGD6TqhEC45hkhHIABd8J2T5o7xwFYq0hog5FMBpgUvRkRNIPgNRFqFxa8WIGjwYkg0FARCr+OT44utoOoLEDZ422FQCM5AJUm0mxmfPQFMg7ejuIVAdM0y+Hd7GCUDtf3I2QWQH//Oxro8nFSZbWTATpbprgViZNEqyCwFILss3hzhxu8n1vMgGxWd7clnLgBQFv/3mawCEDZ4u3XnuNFryyzF20LeZa21T7/Wew3eY9gVYji7ABDVnRTBKPgYAgtqwgUAvAND+R2u4FIRvAvz2QR1Gmc9F4B8u7/OmsX2WTPr9R8mTudx2HIBxGE0TRuPAGn2tpevPwAAAP//AThhuwAAAAZJREFUAwBzJlFwAI1DZwAAAABJRU5ErkJggg==" alt="Ghim">
+                </span>
+                Giá Cần Niêm Yết Trên Sàn
+              </div>
+              <span class="result-header-badge">Giá đề xuất</span>
+            </div>
+
+            <div class="result-amount-box" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-color: #bae6fd;">
+              <div class="result-label" style="color: #0369a1;">Giá bán bạn cần đăng lên sàn</div>
+              <div class="result-amount" style="color: #0284c7;">
+                <span id="requiredPrice">0</span>
+                <span class="currency" style="color: #0284c7;">₫</span>
+              </div>
+              <div class="result-percent-tag" id="reverseSubtitle" style="color: #0369a1;">Nhập số tiền mong muốn để tính</div>
+            </div>
+          </div>
+
+          <div class="formula-banner" style="margin-top: auto; border-left-color: var(--primary);">
+            📌 <strong>Công thức tính ngược chuẩn:</strong><br>
+            <code>Giá niêm yết</code> = [(Số tiền muốn nhận ÷ 0,985) + 3.000₫] ÷ 0,78
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+      Công Cụ Quản Lý Doanh Thu & Giá Bán TMĐT © 2026<br>
+      Tối giản • Nhanh chóng • Chuẩn xác trên mọi thiết bị
+    </footer>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast" id="toastBox">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+    <span id="toastMsg">Đã sao chép vào bộ nhớ tạm!</span>
+  </div>
+
+  <script>
+    // CONSTANTS
+    const FIXED_FEE_RATE = 0.16;       // 16% phí cố định
+    const SERVICE_FEE = 3000;           // 3.000đ phí dịch vụ cố định
+    const TX_FEE_RATE = 0.06;          // 6% phí xử lý giao dịch
+    const TOTAL_SURCHARGE_RATE = FIXED_FEE_RATE + TX_FEE_RATE; // 22%
+
+    const VAT_RATE = 0.01;             // 1% thuế GTGT
+    const PIT_RATE = 0.005;            // 0.5% thuế TNCN (TTCN)
+    const TOTAL_TAX_RATE = VAT_RATE + PIT_RATE; // 1.5%
+
+    // DOM ELEMENTS
+    const priceInput = document.getElementById('priceInput');
+    const clearBtn = document.getElementById('clearBtn');
+    const lowPriceAlert = document.getElementById('lowPriceAlert');
+    const netRevenueEl = document.getElementById('netRevenue');
+    const percentSubtitleEl = document.getElementById('percentSubtitle');
+    const netRatioBadge = document.getElementById('netRatioBadge');
+    const barNet = document.getElementById('barNet');
+    const barFee = document.getElementById('barFee');
+    const barTax = document.getElementById('barTax');
+    const barTooltip = document.getElementById('barTooltip');
+    const barBreakdownText = document.getElementById('barBreakdownText');
+    const summaryTotalFee = document.getElementById('summaryTotalFee');
+    const summaryTotalTax = document.getElementById('summaryTotalTax');
+
+    // Detail breakdown elements
+    const detailCard = document.getElementById('detailCard');
+    const detailFixedFee = document.getElementById('detailFixedFee');
+    const detailServiceFee = document.getElementById('detailServiceFee');
+    const detailTxFee = document.getElementById('detailTxFee');
+    const detailTotalFee = document.getElementById('detailTotalFee');
+    const detailBeforeTax = document.getElementById('detailBeforeTax');
+    const detailVat = document.getElementById('detailVat');
+    const detailPit = document.getElementById('detailPit');
+    const detailTotalTax = document.getElementById('detailTotalTax');
+    const detailNet = document.getElementById('detailNet');
+
+    // Reverse elements
+    const targetNetInput = document.getElementById('targetNetInput');
+    const requiredPriceEl = document.getElementById('requiredPrice');
+    const reverseSubtitle = document.getElementById('reverseSubtitle');
+
+    function formatVND(num) {
+      if (isNaN(num)) return '0';
+      return Math.round(num).toLocaleString('vi-VN');
+    }
+
+    function parseNumber(str) {
+      if (!str) return 0;
+      const clean = str.toString().replace(/[^\d]/g, '');
+      return clean ? parseInt(clean, 10) : 0;
+    }
+
+    // MAIN CALCULATION FUNCTION
+    function calculate() {
+      const price = parseNumber(priceInput.value);
+
+      if (price > 0) {
+        clearBtn.style.display = 'flex';
+      } else {
+        clearBtn.style.display = 'none';
+      }
+
+      if (price <= 0) {
+        lowPriceAlert.classList.remove('show');
+        netRevenueEl.innerText = '0';
+        percentSubtitleEl.innerText = 'Chưa có dữ liệu tính';
+        if (netRatioBadge) netRatioBadge.innerText = 'Thực nhận: 0%';
+        barNet.style.width = '0%';
+        barFee.style.width = '0%';
+        barTax.style.width = '0%';
+        barNet.removeAttribute('data-percent');
+        barFee.removeAttribute('data-percent');
+        barTax.removeAttribute('data-percent');
+        barNet.title = '';
+        barFee.title = '';
+        barTax.title = '';
+        if (barBreakdownText) barBreakdownText.innerText = '';
+        summaryTotalFee.innerText = '0 ₫';
+        summaryTotalTax.innerText = '0 ₫';
+
+        detailFixedFee.innerText = '0 ₫';
+        detailTxFee.innerText = '0 ₫';
+        detailTotalFee.innerText = '0 ₫';
+        detailBeforeTax.innerText = '0 ₫';
+        detailVat.innerText = '0 ₫';
+        detailPit.innerText = '0 ₫';
+        detailTotalTax.innerText = '0 ₫';
+        detailNet.innerText = '0 ₫';
+        return;
+      }
+
+      // 1. Phụ phí sàn
+      const fixedFee = price * FIXED_FEE_RATE; // 16%
+      const serviceFee = SERVICE_FEE;          // 3000
+      const txFee = price * TX_FEE_RATE;       // 6%
+      const totalFee = fixedFee + serviceFee + txFee;
+
+      // 2. Doanh thu trước thuế
+      const revenueBeforeTax = price - totalFee;
+
+      if (revenueBeforeTax <= 0) {
+        lowPriceAlert.classList.add('show');
+        netRevenueEl.innerText = '0';
+        percentSubtitleEl.innerText = 'Giá bán không đủ bù phụ phí!';
+        if (netRatioBadge) {
+          netRatioBadge.innerText = 'Lỗ phụ phí';
+          netRatioBadge.style.background = 'var(--danger-soft)';
+          netRatioBadge.style.color = 'var(--danger)';
+        }
+
+        barNet.style.width = '0%';
+        barFee.style.width = '100%';
+        barTax.style.width = '0%';
+        barNet.removeAttribute('data-percent');
+        barFee.setAttribute('data-percent', '100%');
+        barFee.setAttribute('data-amount', `${formatVND(totalFee)} ₫`);
+        barFee.title = `100% (${formatVND(totalFee)} ₫)`;
+        barTax.removeAttribute('data-percent');
+        if (barBreakdownText) barBreakdownText.innerText = '';
+
+        summaryTotalFee.innerText = `${formatVND(totalFee)} ₫`;
+        summaryTotalTax.innerText = '0 ₫';
+
+        detailFixedFee.innerText = `-${formatVND(fixedFee)} ₫`;
+        detailTxFee.innerText = `-${formatVND(txFee)} ₫`;
+        detailTotalFee.innerText = `-${formatVND(totalFee)} ₫`;
+        detailBeforeTax.innerText = `-${formatVND(Math.abs(revenueBeforeTax))} ₫`;
+        detailVat.innerText = '0 ₫';
+        detailPit.innerText = '0 ₫';
+        detailTotalTax.innerText = '0 ₫';
+        detailNet.innerText = '0 ₫';
+        return;
+      }
+
+      lowPriceAlert.classList.remove('show');
+      if (netRatioBadge) {
+        netRatioBadge.style.background = 'var(--success-soft)';
+        netRatioBadge.style.color = 'var(--success)';
+      }
+
+      // 3. Thuế
+      const vat = revenueBeforeTax * VAT_RATE; // 1%
+      const pit = revenueBeforeTax * PIT_RATE; // 0.5%
+      const totalTax = vat + pit;              // 1.5%
+
+      // 4. Doanh thu thực nhận
+      const netRevenue = revenueBeforeTax - totalTax;
+
+      // Percentages
+      const netPercent = ((netRevenue / price) * 100).toFixed(1);
+      const feePercent = ((totalFee / price) * 100).toFixed(1);
+      const taxPercent = ((totalTax / price) * 100).toFixed(1);
+      const totalDeduction = totalFee + totalTax;
+
+      // Render Khung 2
+      netRevenueEl.innerText = formatVND(netRevenue);
+      if (netRatioBadge) netRatioBadge.innerText = `Thực nhận: ${netPercent}%`;
+      percentSubtitleEl.innerText = `Khấu trừ ${((totalDeduction / price) * 100).toFixed(1)}% (-${formatVND(totalDeduction)} ₫)`;
+
+      // Progress bar with data attributes for hover
+      barNet.style.width = `${netPercent}%`;
+      barFee.style.width = `${feePercent}%`;
+      barTax.style.width = `${taxPercent}%`;
+
+      barNet.setAttribute('data-percent', `${netPercent}%`);
+      barNet.setAttribute('data-amount', `${formatVND(netRevenue)} ₫`);
+      barNet.title = `${netPercent}% (${formatVND(netRevenue)} ₫)`;
+
+      barFee.setAttribute('data-percent', `${feePercent}%`);
+      barFee.setAttribute('data-amount', `${formatVND(totalFee)} ₫`);
+      barFee.title = `${feePercent}% (${formatVND(totalFee)} ₫)`;
+
+      barTax.setAttribute('data-percent', `${taxPercent}%`);
+      barTax.setAttribute('data-amount', `${formatVND(totalTax)} ₫`);
+      barTax.title = `${taxPercent}% (${formatVND(totalTax)} ₫)`;
+
+      if (barBreakdownText) barBreakdownText.innerText = `${netPercent}% Nhận | ${feePercent}% Phí | ${taxPercent}% Thuế`;
+
+      summaryTotalFee.innerText = `${formatVND(totalFee)} ₫`;
+      summaryTotalTax.innerText = `${formatVND(totalTax)} ₫`;
+
+      // Render Chi Tiết
+      detailFixedFee.innerText = `-${formatVND(fixedFee)} ₫`;
+      detailServiceFee.innerText = `-${formatVND(serviceFee)} ₫`;
+      detailTxFee.innerText = `-${formatVND(txFee)} ₫`;
+      detailTotalFee.innerText = `-${formatVND(totalFee)} ₫`;
+
+      detailBeforeTax.innerText = `${formatVND(revenueBeforeTax)} ₫`;
+
+      detailVat.innerText = `-${formatVND(vat)} ₫`;
+      detailPit.innerText = `-${formatVND(pit)} ₫`;
+      detailTotalTax.innerText = `-${formatVND(totalTax)} ₫`;
+
+      detailNet.innerText = `${formatVND(netRevenue)} ₫`;
+    }
+
+    // REVERSE CALCULATION
+    function calculateReverse() {
+      const targetNet = parseNumber(targetNetInput.value);
+
+      if (targetNet <= 0) {
+        requiredPriceEl.innerText = '0';
+        reverseSubtitle.innerText = 'Nhập số tiền mong muốn để tính';
+        return;
+      }
+
+      const beforeTax = targetNet / (1 - TOTAL_TAX_RATE);
+      const requiredPrice = (beforeTax + SERVICE_FEE) / (1 - TOTAL_SURCHARGE_RATE);
+
+      requiredPriceEl.innerText = formatVND(requiredPrice);
+      reverseSubtitle.innerText = `Sau khi trừ ${formatVND(requiredPrice - targetNet)}₫ phí & thuế sẽ còn đúng ${formatVND(targetNet)}₫`;
+    }
+
+    // INPUT LISTENERS
+    priceInput.addEventListener('input', (e) => {
+      const num = parseNumber(e.target.value);
+      if (num === 0) {
+        e.target.value = '';
+      } else {
+        e.target.value = formatVND(num);
+      }
+      calculate();
+    });
+
+    targetNetInput.addEventListener('input', (e) => {
+      const num = parseNumber(e.target.value);
+      if (num === 0) {
+        e.target.value = '';
+      } else {
+        e.target.value = formatVND(num);
+      }
+      calculateReverse();
+    });
+
+    // PRESET BUTTONS
+    function setPreset(amount) {
+      priceInput.value = formatVND(amount);
+      calculate();
+    }
+
+    function setReversePreset(amount) {
+      targetNetInput.value = formatVND(amount);
+      calculateReverse();
+    }
+
+    // CLEAR & RESET
+    clearBtn.addEventListener('click', () => {
+      priceInput.value = '';
+      priceInput.focus();
+      calculate();
+    });
+
+    function resetAll() {
+      priceInput.value = '';
+      targetNetInput.value = '';
+      calculate();
+      calculateReverse();
+      showToast('Đã làm mới dữ liệu!');
+    }
+
+    // ACCORDION TOGGLE
+    function toggleDetail() {
+      detailCard.classList.toggle('open');
+    }
+
+    // TAB SWITCHER
+    function switchMode(mode) {
+      const forwardTab = document.getElementById('forwardMode');
+      const reverseTab = document.getElementById('reverseMode');
+      const tabForwardBtn = document.getElementById('tabForwardBtn');
+      const tabReverseBtn = document.getElementById('tabReverseBtn');
+
+      if (mode === 'forward') {
+        forwardTab.classList.remove('hidden');
+        reverseTab.classList.remove('active');
+        tabForwardBtn.classList.add('active');
+        tabReverseBtn.classList.remove('active');
+      } else {
+        forwardTab.classList.add('hidden');
+        reverseTab.classList.add('active');
+        tabForwardBtn.classList.remove('active');
+        tabReverseBtn.classList.add('active');
+        if (!targetNetInput.value) {
+          const currentNet = parseNumber(netRevenueEl.innerText);
+          if (currentNet > 0) {
+            targetNetInput.value = formatVND(currentNet);
+            calculateReverse();
+          }
+        }
+      }
+    }
+
+    // COPY RESULT
+    function copyResult() {
+      const price = priceInput.value || '0';
+      const net = netRevenueEl.innerText || '0';
+      const fee = summaryTotalFee.innerText || '0';
+      const tax = summaryTotalTax.innerText || '0';
+
+      if (parseNumber(price) <= 0) {
+        showToast('Vui lòng nhập giá sản phẩm trước!');
+        return;
+      }
+
+      const textToCopy = 
+`📊 TÍNH TOÁN DOANH THU SÀN TMĐT
+• Giá bán ban đầu: ${price} ₫
+• Tổng phụ phí sàn (16% + 3k + 6%): ${fee}
+• Tổng thuế (GTGT 1% + TNCN 0.5%): ${tax}
+━━━━━━━━━━━━━━━━━━
+💰 THỰC NHẬN VỀ VÍ: ${net} ₫`;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(textToCopy).then(() => {
+          showToast('Đã sao chép chi tiết kết quả!');
+        }).catch(() => {
+          fallbackCopy(textToCopy);
+        });
+      } else {
+        fallbackCopy(textToCopy);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showToast('Đã sao chép chi tiết kết quả!');
+      } catch (err) {
+        showToast('Không thể sao chép tự động!');
+      }
+      document.body.removeChild(textArea);
+    }
+
+    // TOAST
+    function showToast(msg) {
+      const toast = document.getElementById('toastBox');
+      const toastMsg = document.getElementById('toastMsg');
+      toastMsg.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    // PROGRESS BAR HOVER TOOLTIP
+    function updateBarTooltip(seg) {
+      if (!barTooltip) return;
+      const percent = seg.getAttribute('data-percent');
+      if (!percent || percent === '0%') {
+        hideBarTooltip();
+        return;
+      }
+      const amount = seg.getAttribute('data-amount') || '';
+      barTooltip.innerHTML = `<strong>${percent}</strong> <span style="font-weight: 500; opacity: 0.85;">(${amount})</span>`;
+
+      const wrapper = seg.closest('.progress-bar-wrapper');
+      if (!wrapper) return;
+      const wrapperRect = wrapper.getBoundingClientRect();
+      const segRect = seg.getBoundingClientRect();
+
+      let center = (segRect.left + segRect.width / 2) - wrapperRect.left;
+      center = Math.max(50, Math.min(wrapperRect.width - 50, center));
+
+      barTooltip.style.left = `${center}px`;
+      barTooltip.classList.add('show');
+    }
+
+    function hideBarTooltip() {
+      if (barTooltip) barTooltip.classList.remove('show');
+    }
+
+    function initBarTooltip() {
+      const segments = [barNet, barFee, barTax];
+      segments.forEach(seg => {
+        if (!seg) return;
+        seg.addEventListener('mouseenter', () => updateBarTooltip(seg));
+        seg.addEventListener('mousemove', () => updateBarTooltip(seg));
+        seg.addEventListener('mouseleave', hideBarTooltip);
+        seg.addEventListener('touchstart', () => {
+          updateBarTooltip(seg);
+        }, { passive: true });
+      });
+
+      document.addEventListener('touchstart', (e) => {
+        if (!e.target.closest('.progress-bar-wrapper') && barTooltip) {
+          hideBarTooltip();
+        }
+      }, { passive: true });
+    }
+
+    // Khởi tạo mặc định 0đ
+    window.addEventListener('DOMContentLoaded', () => {
+      initBarTooltip();
+      calculate();
+    });
+  </script>
+</body>
+</html>
