@@ -14,7 +14,7 @@ import os
 import base64
 
 icons = {}
-for k, fname in [('icon_pin', 'icon_pin.png'), ('icon_wallet', 'icon_wallet.png'), ('icon_detail', 'icon_detail.png')]:
+for k, fname in [('icon_pin', 'icon_pin.png'), ('icon_wallet', 'icon_wallet.png'), ('icon_detail', 'icon_detail.png'), ('icon_shopee', 'logo_shopee.png')]:
     fpath = os.path.join('assets', fname)
     with open(fpath, 'rb') as img_f:
         icons[k] = f"data:image/png;base64,{base64.b64encode(img_f.read()).decode('utf-8')}"
@@ -98,6 +98,14 @@ html_content = f'''<!DOCTYPE html>
       margin-bottom: 12px;
       letter-spacing: 0.5px;
       text-transform: uppercase;
+    }}
+
+    .header-logo {{
+      height: 38px;
+      width: auto;
+      object-fit: contain;
+      margin-bottom: 14px;
+      display: inline-block;
     }}
 
     .header h1 {{
@@ -759,7 +767,6 @@ html_content = f'''<!DOCTYPE html>
     .formula-banner {{
       background: #f8fafc;
       border: 1px solid #e2e8f0;
-      border-left: 4px solid var(--primary);
       border-radius: 8px;
       padding: 12px 14px;
       font-size: 12.5px;
@@ -849,7 +856,7 @@ html_content = f'''<!DOCTYPE html>
   <div class="container">
     <!-- HEADER -->
     <header class="header">
-      <div class="badge-tag">SÀN THƯƠNG MẠI ĐIỆN TỬ</div>
+      <img src="{icons['icon_shopee']}" alt="Shopee" class="header-logo">
       <h1>Tính Doanh Thu Dự Kiến Sau Chiết Khấu</h1>
     </header>
 
@@ -897,7 +904,7 @@ html_content = f'''<!DOCTYPE html>
 
             <!-- Quick presets -->
             <div class="quick-presets">
-              <button class="preset-chip" onclick="setPreset(50000)">+50k</button>
+              <button class="preset-chip" onclick="setPreset(50000)">50k</button>
               <button class="preset-chip" onclick="setPreset(100000)">100k</button>
               <button class="preset-chip" onclick="setPreset(200000)">200k</button>
               <button class="preset-chip" onclick="setPreset(350000)">350k</button>
@@ -1039,7 +1046,7 @@ html_content = f'''<!DOCTYPE html>
                   <span class="item-name">Phí dịch vụ cố định</span>
                   <span class="item-formula">Khoản thu cố định mỗi đơn</span>
                 </td>
-                <td class="item-val deduct" id="detailServiceFee">3.000 ₫</td>
+                <td class="item-val deduct" id="detailServiceFee">0 ₫</td>
               </tr>
               <tr>
                 <td>
@@ -1151,6 +1158,7 @@ html_content = f'''<!DOCTYPE html>
                 placeholder="0"
                 autocomplete="off"
               >
+              <button class="clear-btn" id="clearReverseBtn" title="Xoá">✕</button>
               <span class="currency-suffix">₫</span>
             </div>
 
@@ -1159,7 +1167,7 @@ html_content = f'''<!DOCTYPE html>
               <button class="preset-chip" onclick="setReversePreset(100000)">100k</button>
               <button class="preset-chip" onclick="setReversePreset(200000)">200k</button>
               <button class="preset-chip" onclick="setReversePreset(500000)">500k</button>
-              <button class="preset-chip" onclick="setReversePreset(1000000)">1 Tr</button>
+              <button class="preset-chip" onclick="setReversePreset(1000000)">1 Triệu</button>
             </div>
           </div>
 
@@ -1190,7 +1198,7 @@ html_content = f'''<!DOCTYPE html>
             </div>
           </div>
 
-          <div class="formula-banner" style="margin-top: auto; border-left-color: var(--primary);">
+          <div class="formula-banner" style="margin-top: auto;">
             📌 <strong>Công thức tính ngược chuẩn:</strong><br>
             <code>Giá niêm yết</code> = [(Số tiền muốn nhận ÷ 0,985) + 3.000₫] ÷ 0,78
           </div>
@@ -1228,12 +1236,10 @@ html_content = f'''<!DOCTYPE html>
     const lowPriceAlert = document.getElementById('lowPriceAlert');
     const netRevenueEl = document.getElementById('netRevenue');
     const percentSubtitleEl = document.getElementById('percentSubtitle');
-    const netRatioBadge = document.getElementById('netRatioBadge');
     const barNet = document.getElementById('barNet');
     const barFee = document.getElementById('barFee');
     const barTax = document.getElementById('barTax');
     const barTooltip = document.getElementById('barTooltip');
-    const barBreakdownText = document.getElementById('barBreakdownText');
     const summaryTotalFee = document.getElementById('summaryTotalFee');
     const summaryTotalTax = document.getElementById('summaryTotalTax');
 
@@ -1251,6 +1257,7 @@ html_content = f'''<!DOCTYPE html>
 
     // Reverse elements
     const targetNetInput = document.getElementById('targetNetInput');
+    const clearReverseBtn = document.getElementById('clearReverseBtn');
     const requiredPriceEl = document.getElementById('requiredPrice');
     const reverseSubtitle = document.getElementById('reverseSubtitle');
 
@@ -1279,7 +1286,6 @@ html_content = f'''<!DOCTYPE html>
         lowPriceAlert.classList.remove('show');
         netRevenueEl.innerText = '0';
         percentSubtitleEl.innerText = 'Chưa có dữ liệu tính';
-        if (netRatioBadge) netRatioBadge.innerText = 'Thực nhận: 0%';
         barNet.style.width = '0%';
         barFee.style.width = '0%';
         barTax.style.width = '0%';
@@ -1289,11 +1295,11 @@ html_content = f'''<!DOCTYPE html>
         barNet.title = '';
         barFee.title = '';
         barTax.title = '';
-        if (barBreakdownText) barBreakdownText.innerText = '';
         summaryTotalFee.innerText = '0 ₫';
         summaryTotalTax.innerText = '0 ₫';
 
         detailFixedFee.innerText = '0 ₫';
+        detailServiceFee.innerText = '0 ₫';
         detailTxFee.innerText = '0 ₫';
         detailTotalFee.innerText = '0 ₫';
         detailBeforeTax.innerText = '0 ₫';
@@ -1317,11 +1323,6 @@ html_content = f'''<!DOCTYPE html>
         lowPriceAlert.classList.add('show');
         netRevenueEl.innerText = '0';
         percentSubtitleEl.innerText = 'Giá bán không đủ bù phụ phí!';
-        if (netRatioBadge) {{
-          netRatioBadge.innerText = 'Lỗ phụ phí';
-          netRatioBadge.style.background = 'var(--danger-soft)';
-          netRatioBadge.style.color = 'var(--danger)';
-        }}
 
         barNet.style.width = '0%';
         barFee.style.width = '100%';
@@ -1331,12 +1332,12 @@ html_content = f'''<!DOCTYPE html>
         barFee.setAttribute('data-amount', `${{formatVND(totalFee)}} ₫`);
         barFee.title = `100% (${{formatVND(totalFee)}} ₫)`;
         barTax.removeAttribute('data-percent');
-        if (barBreakdownText) barBreakdownText.innerText = '';
 
         summaryTotalFee.innerText = `${{formatVND(totalFee)}} ₫`;
         summaryTotalTax.innerText = '0 ₫';
 
         detailFixedFee.innerText = `-${{formatVND(fixedFee)}} ₫`;
+        detailServiceFee.innerText = `-${{formatVND(serviceFee)}} ₫`;
         detailTxFee.innerText = `-${{formatVND(txFee)}} ₫`;
         detailTotalFee.innerText = `-${{formatVND(totalFee)}} ₫`;
         detailBeforeTax.innerText = `-${{formatVND(Math.abs(revenueBeforeTax))}} ₫`;
@@ -1348,10 +1349,6 @@ html_content = f'''<!DOCTYPE html>
       }}
 
       lowPriceAlert.classList.remove('show');
-      if (netRatioBadge) {{
-        netRatioBadge.style.background = 'var(--success-soft)';
-        netRatioBadge.style.color = 'var(--success)';
-      }}
 
       // 3. Thuế
       const vat = revenueBeforeTax * VAT_RATE; // 1%
@@ -1369,7 +1366,6 @@ html_content = f'''<!DOCTYPE html>
 
       // Render Khung 2
       netRevenueEl.innerText = formatVND(netRevenue);
-      if (netRatioBadge) netRatioBadge.innerText = `Thực nhận: ${{netPercent}}%`;
       percentSubtitleEl.innerText = `Khấu trừ ${{((totalDeduction / price) * 100).toFixed(1)}}% (-${{formatVND(totalDeduction)}} ₫)`;
 
       // Progress bar with data attributes for hover
@@ -1388,8 +1384,6 @@ html_content = f'''<!DOCTYPE html>
       barTax.setAttribute('data-percent', `${{taxPercent}}%`);
       barTax.setAttribute('data-amount', `${{formatVND(totalTax)}} ₫`);
       barTax.title = `${{taxPercent}}% (${{formatVND(totalTax)}} ₫)`;
-
-      if (barBreakdownText) barBreakdownText.innerText = `${{netPercent}}% Nhận | ${{feePercent}}% Phí | ${{taxPercent}}% Thuế`;
 
       summaryTotalFee.innerText = `${{formatVND(totalFee)}} ₫`;
       summaryTotalTax.innerText = `${{formatVND(totalTax)}} ₫`;
@@ -1412,6 +1406,10 @@ html_content = f'''<!DOCTYPE html>
     // REVERSE CALCULATION
     function calculateReverse() {{
       const targetNet = parseNumber(targetNetInput.value);
+
+      if (clearReverseBtn) {{
+        clearReverseBtn.style.display = targetNet > 0 ? 'flex' : 'none';
+      }}
 
       if (targetNet <= 0) {{
         requiredPriceEl.innerText = '0';
@@ -1464,6 +1462,14 @@ html_content = f'''<!DOCTYPE html>
       priceInput.focus();
       calculate();
     }});
+
+    if (clearReverseBtn) {{
+      clearReverseBtn.addEventListener('click', () => {{
+        targetNetInput.value = '';
+        targetNetInput.focus();
+        calculateReverse();
+      }});
+    }}
 
     function resetAll() {{
       priceInput.value = '';
@@ -1518,12 +1524,12 @@ html_content = f'''<!DOCTYPE html>
       }}
 
       const textToCopy = 
-`📊 TÍNH TOÁN DOANH THU SÀN TMĐT
+`TÍNH TOÁN DOANH THU SÀN TMĐT
 • Giá bán ban đầu: ${{price}} ₫
 • Tổng phụ phí sàn (16% + 3k + 6%): ${{fee}}
 • Tổng thuế (GTGT 1% + TNCN 0.5%): ${{tax}}
 ━━━━━━━━━━━━━━━━━━
-💰 THỰC NHẬN VỀ VÍ: ${{net}} ₫`;
+THỰC NHẬN VỀ VÍ: ${{net}} ₫`;
 
       if (navigator.clipboard && navigator.clipboard.writeText) {{
         navigator.clipboard.writeText(textToCopy).then(() => {{
