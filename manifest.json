@@ -1,6 +1,6 @@
 {
-  "name": "Shopee Revenue Estimator",
-  "short_name": "Shopee Calc",
+  "name": "Shopee Estimator",
+  "short_name": "Shopee Estimator",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f8fafc",

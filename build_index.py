@@ -19,13 +19,13 @@ template = """<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title id="htmlTitle">Estimated Net Revenue Calculator - E-Commerce</title>
+  <title id="htmlTitle">Shopee Estimator</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0284c7">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Shopee Calc">
+  <meta name="apple-mobile-web-app-title" content="Shopee Estimator">
   <link rel="apple-touch-icon" href="assets/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -128,7 +128,7 @@ template = """<!DOCTYPE html>
       box-sizing: border-box;
     }
 
-    #themeBtn {
+    #themeBtn, #policyDocBtn, #marketSwitchBtn {
       width: 34px;
       height: 34px;
       padding: 0;
@@ -1512,6 +1512,276 @@ template = """<!DOCTYPE html>
     .alert-box.show {
       display: block;
     }
+
+    /* POLICY DOCUMENTS MODAL (IMAGE 2 STYLE) */
+    .policy-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .policy-modal-backdrop.show {
+      display: flex;
+      opacity: 1;
+    }
+
+    .policy-modal-card {
+      background: var(--card-bg);
+      border-radius: 18px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      transform: scale(0.96);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .policy-modal-backdrop.show .policy-modal-card {
+      transform: scale(1);
+    }
+
+    .policy-modal-header {
+      padding: 15px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+      background: var(--card-bg);
+    }
+
+    .policy-modal-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .policy-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #10b981;
+      display: inline-block;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    }
+
+    .policy-modal-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin: 0;
+      letter-spacing: -0.3px;
+    }
+
+    .policy-market-badge {
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--primary-soft);
+      color: var(--primary);
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+
+    .policy-close-x {
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      color: var(--text-light);
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      line-height: 1;
+      transition: all 0.15s ease;
+    }
+
+    .policy-close-x:hover {
+      background: var(--bg-body);
+      color: var(--text-main);
+    }
+
+    .policy-modal-body {
+      padding: 8px 12px;
+      overflow-y: auto;
+      flex: 1;
+      overscroll-behavior: contain;
+    }
+
+    .policy-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 13px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-color);
+      text-decoration: none;
+      border-radius: 10px;
+      transition: background 0.15s ease;
+      margin-bottom: 2px;
+    }
+
+    .policy-item:last-child {
+      border-bottom: none;
+    }
+
+    .policy-item:hover {
+      background: #f8fafc;
+    }
+
+    .policy-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 11px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      letter-spacing: 0.5px;
+    }
+
+    .policy-badge-edu { background: #fff7ed; color: #ea580c; border: 1px solid #ffedd5; }
+    .policy-badge-pay { background: #eff6ff; color: #2563eb; border: 1px solid #dbeafe; }
+    .policy-badge-fee { background: #ecfdf5; color: #059669; border: 1px solid #d1fae5; }
+    .policy-badge-xtra { background: #fff1f2; color: #e11d48; border: 1px solid #ffe4e6; }
+    .policy-badge-tax { background: #faf5ff; color: #9333ea; border: 1px solid #f3e8ff; }
+    .policy-badge-doc { background: #f0fdfa; color: #0d9488; border: 1px solid #ccfbf1; }
+    .policy-badge-hub { background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; }
+
+    .policy-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .policy-source {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .policy-source-edu { color: #ea580c; }
+    .policy-source-pay { color: #2563eb; }
+    .policy-source-fee { color: #059669; }
+    .policy-source-xtra { color: #e11d48; }
+    .policy-source-tax { color: #9333ea; }
+    .policy-source-doc { color: #0d9488; }
+    .policy-source-hub { color: #64748b; }
+
+    .policy-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 4px;
+      line-height: 1.35;
+      transition: color 0.15s ease;
+    }
+
+    .policy-item:hover .policy-title {
+      color: var(--primary);
+    }
+
+    .policy-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .policy-icon-ext {
+      flex-shrink: 0;
+      color: var(--text-light);
+      margin-top: 4px;
+      transition: color 0.15s ease, transform 0.15s ease;
+    }
+
+    .policy-item:hover .policy-icon-ext {
+      color: var(--primary);
+      transform: translate(2px, -2px);
+    }
+
+    .policy-modal-footer {
+      padding: 12px 18px;
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-body);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .policy-footer-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-size: 12.5px;
+    }
+
+    .policy-footer-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-soft);
+    }
+
+    /* DARK MODE CHO POLICY MODAL */
+    body.dark-mode .policy-modal-card {
+      background: #0d131f;
+      border-color: #1e293b;
+    }
+    body.dark-mode .policy-modal-header,
+    body.dark-mode .policy-modal-footer,
+    body.dark-mode .policy-item {
+      border-color: #1e293b;
+    }
+    body.dark-mode .policy-modal-header {
+      background: #0d131f;
+    }
+    body.dark-mode .policy-modal-footer {
+      background: #090d16;
+    }
+    body.dark-mode .policy-item:hover {
+      background: #131c2e;
+    }
+    body.dark-mode .policy-footer-btn {
+      background: #131c2e;
+      border-color: #1e293b;
+      color: #f8fafc;
+    }
+    body.dark-mode .policy-footer-btn:hover {
+      border-color: #38bdf8;
+      color: #38bdf8;
+      background: var(--primary-soft);
+    }
+    body.dark-mode .policy-close-x:hover {
+      background: #1e293b;
+      color: #f8fafc;
+    }
+    body.dark-mode .policy-badge-edu { background: rgba(234, 88, 12, 0.15); color: #fb923c; border-color: rgba(234, 88, 12, 0.3); }
+    body.dark-mode .policy-badge-pay { background: rgba(37, 99, 235, 0.15); color: #60a5fa; border-color: rgba(37, 99, 235, 0.3); }
+    body.dark-mode .policy-badge-fee { background: rgba(5, 150, 105, 0.15); color: #34d399; border-color: rgba(5, 150, 105, 0.3); }
+    body.dark-mode .policy-badge-xtra { background: rgba(225, 29, 72, 0.15); color: #fb7185; border-color: rgba(225, 29, 72, 0.3); }
+    body.dark-mode .policy-badge-tax { background: rgba(147, 51, 234, 0.15); color: #c084fc; border-color: rgba(147, 51, 234, 0.3); }
+    body.dark-mode .policy-badge-doc { background: rgba(13, 148, 136, 0.15); color: #2dd4bf; border-color: rgba(13, 148, 136, 0.3); }
+    body.dark-mode .policy-badge-hub { background: rgba(100, 116, 139, 0.15); color: #94a3b8; border-color: rgba(100, 116, 139, 0.3); }
   </style>
 </head>
 <body>
@@ -1524,6 +1794,12 @@ template = """<!DOCTYPE html>
           <path d="M8.75 21.5v-7a1 1 0 0 1 1-1h4.5a1 1 0 0 1 1 1v7"/>
         </svg>
         <span id="marketDisplayCode" style="display: none;">Shopee VN</span>
+      </button>
+      <button class="top-btn" id="policyDocBtn" onclick="openPolicyModal()" style="display: none;" title="Tài liệu chính sách / Policy documents" aria-label="Tài liệu chính sách">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
       </button>
       <button class="top-btn" id="langBtn" onclick="toggleLang()" style="display: none;" title="Chuyển đổi ngôn ngữ / Switch language">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.85;">
@@ -2048,6 +2324,27 @@ template = """<!DOCTYPE html>
     </footer>
   </div>
 
+  <!-- POLICY DOCUMENTS MODAL (IMAGE 2 STYLE) -->
+  <div id="policyModal" class="policy-modal-backdrop" onclick="onPolicyBackdropClick(event)">
+    <div class="policy-modal-card" role="dialog" aria-modal="true" aria-labelledby="policyModalTitle">
+      <div class="policy-modal-header">
+        <div class="policy-modal-title-wrap">
+          <span class="policy-dot"></span>
+          <h2 id="policyModalTitle" class="policy-modal-title" data-i18n="policyModalTitle">Tài Liệu Tham Khảo Chính Sách</h2>
+          <span id="policyMarketBadge" class="policy-market-badge">VN</span>
+        </div>
+        <button class="policy-close-x" onclick="closePolicyModal()" title="Đóng / Close" aria-label="Close">✕</button>
+      </div>
+      <div class="policy-modal-body" id="policyListContainer">
+        <!-- Dynamically populated from POLICY_DOCS -->
+      </div>
+      <div class="policy-modal-footer">
+        <span class="policy-footer-note" data-i18n="policyFooterNote">Nguồn chính sách &amp; biểu phí chính thức từ Shopee</span>
+        <button class="policy-footer-btn" onclick="closePolicyModal()" data-i18n="policyCloseBtn">Đóng</button>
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST NOTIFICATION -->
   <div class="toast" id="toastBox">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
@@ -2058,7 +2355,7 @@ template = """<!DOCTYPE html>
     // DICTIONARY I18N
     const I18N = {
       vi: {
-        pageTitle: "Tính Doanh Thu Dự Kiến Sau Chiết Khấu - Sàn TMĐT",
+        pageTitle: "Shopee Estimator",
         headerTitle: "Tính Doanh Thu Dự Kiến Sau Chiết Khấu",
         marketTitle: "Chọn Thị Trường Shopee",
         marketSubtitle: "Vui lòng chọn quốc gia bạn đang kinh doanh để bắt đầu tính toán",
@@ -2140,10 +2437,14 @@ template = """<!DOCTYPE html>
         exportDeductions: "CHI TIẾT KHẤU TRỪ SÀN & THUẾ",
         exportTotalDeductions: "Tổng khấu trừ sàn & thuế",
         exportNetBadge: "Thực nhận",
-        exportFooterText: "Copyright © 2026 Shopee Estimator. All rights reserved."
+        exportFooterText: "Copyright © 2026 Shopee Estimator. All rights reserved.",
+        policyBtnTitle: "Tài liệu chính sách Shopee",
+        policyModalTitle: "Tài Liệu Tham Khảo Chính Sách",
+        policyFooterNote: "Nguồn chính sách & biểu phí chính thức từ Shopee",
+        policyCloseBtn: "Đóng"
       },
       en: {
-        pageTitle: "Estimated Net Revenue Calculator - E-Commerce",
+        pageTitle: "Shopee Estimator",
         headerTitle: "Estimated Net Revenue Calculator",
         marketTitle: "Select Shopee Marketplace",
         marketSubtitle: "Please select your sales country to start calculating",
@@ -2225,10 +2526,14 @@ template = """<!DOCTYPE html>
         exportDeductions: "FEE & TAX DEDUCTIONS BREAKDOWN",
         exportTotalDeductions: "Total Platform Fees & Tax",
         exportNetBadge: "Net Payout",
-        exportFooterText: "Copyright © 2026 Shopee Estimator. All rights reserved."
+        exportFooterText: "Copyright © 2026 Shopee Estimator. All rights reserved.",
+        policyBtnTitle: "Shopee Policy Documents",
+        policyModalTitle: "Official Policy References",
+        policyFooterNote: "Official Shopee seller policies & fee schedules",
+        policyCloseBtn: "Close"
       },
       th: {
-        pageTitle: "โปรแกรมคำนวณรายรับสุทธิ - Shopee ประเทศไทย",
+        pageTitle: "Shopee Estimator",
         headerTitle: "คำนวณรายรับสุทธิหลังหักค่าธรรมเนียม",
         marketTitle: "เลือกตลาด Shopee",
         marketSubtitle: "กรุณาเลือกประเทศที่คุณดำเนินธุรกิจเพื่อเริ่มต้นคำนวณ",
@@ -2310,10 +2615,14 @@ template = """<!DOCTYPE html>
         exportDeductions: "รายละเอียดการหักค่าธรรมเนียมและภาษี",
         exportTotalDeductions: "รวมค่าธรรมเนียมและภาษีทั้งหมด",
         exportNetBadge: "รายรับสุทธิ",
-        exportFooterText: "Copyright © 2026 Shopee Estimator. All rights reserved."
+        exportFooterText: "Copyright © 2026 Shopee Estimator. All rights reserved.",
+        policyBtnTitle: "เอกสารนโยบาย Shopee",
+        policyModalTitle: "เอกสารอ้างอิงนโยบายอย่างเป็นทางการ",
+        policyFooterNote: "ข้อมูลอ้างอิงจากศูนย์การเรียนรู้ผู้ขาย Shopee",
+        policyCloseBtn: "ปิด"
       },
       ms: {
-        pageTitle: "Kalkulator Anggaran Pendapatan Bersih - Shopee Malaysia",
+        pageTitle: "Shopee Estimator",
         headerTitle: "Kira Anggaran Pendapatan Bersih Selepas Potongan",
         marketTitle: "Pilih Pasaran Shopee",
         marketSubtitle: "Sila pilih negara jualan anda untuk mula mengira",
@@ -2395,10 +2704,14 @@ template = """<!DOCTYPE html>
         exportDeductions: "PECAHAN POTONGAN YURAN & CUKAI",
         exportTotalDeductions: "Jumlah Potongan Yuran & Cukai",
         exportNetBadge: "Bersih Diterima",
-        exportFooterText: "Copyright © 2026 Shopee Estimator. All rights reserved."
+        exportFooterText: "Copyright © 2026 Shopee Estimator. All rights reserved.",
+        policyBtnTitle: "Dokumen Dasar Shopee",
+        policyModalTitle: "Rujukan Dasar Rasmi",
+        policyFooterNote: "Sumber rasmi dari Pusat Pembelajaran Penjual Shopee",
+        policyCloseBtn: "Tutup"
       },
       tl: {
-        pageTitle: "Tagapagtantya ng Netong Kita - Shopee Philippines",
+        pageTitle: "Shopee Estimator",
         headerTitle: "Kalkulahin ang Netong Kita Matapos ang Bawas",
         marketTitle: "Pumili ng Marketplace sa Shopee",
         marketSubtitle: "Mangyaring piliin ang bansa ng iyong benta upang simulan ang pagkalkula",
@@ -2480,7 +2793,11 @@ template = """<!DOCTYPE html>
         exportDeductions: "PAGKAKAHATI NG MGA BAWAS SA BAYAD AT BUWIS",
         exportTotalDeductions: "Kabuuang Bawas sa Bayad at Buwis",
         exportNetBadge: "Netong Natanggap",
-        exportFooterText: "Copyright © 2026 Shopee Estimator. All rights reserved."
+        exportFooterText: "Copyright © 2026 Shopee Estimator. All rights reserved.",
+        policyBtnTitle: "Mga Dokumento ng Patakaran sa Shopee",
+        policyModalTitle: "Mga Opisyal na Sanggunian sa Patakaran",
+        policyFooterNote: "Opisyal na patakaran at iskedyul ng bayad mula sa Shopee",
+        policyCloseBtn: "Isara"
       }
     };
 
@@ -2798,6 +3115,458 @@ template = """<!DOCTYPE html>
       }
     };
 
+    // OFFICIAL SHOPEE POLICY DOCUMENTS DATABASE
+    const POLICY_DOCS = {
+      vn: [
+        {
+          url: "https://banhang.shopee.vn/edu/article/251",
+          badge: "EDU",
+          badgeType: "edu",
+          source: { vi: "Shopee Học Viện Người Bán", en: "Shopee Seller Education", th: "Shopee Seller Education", ms: "Shopee Seller Education", tl: "Shopee Seller Education" },
+          title: {
+            vi: "Chính sách Phí Cố Định áp dụng cho Người Bán Không Thuộc Shopee Mall",
+            en: "Shopee Fixed Commission Fee for Non-Mall Sellers",
+            th: "นโยบายค่าธรรมเนียมการขายสำหรับผู้ขายที่ไม่ใช่ Mall",
+            ms: "Dasar Yuran Komisen Tetap Penjual Bukan Mall",
+            tl: "Patakaran sa Fixed Commission Fee para sa Non-Mall Sellers"
+          },
+          desc: {
+            vi: "Biểu phí cố định 16% tính trên giá trị sản phẩm áp dụng cho các gian hàng Non-Mall trên toàn sàn Shopee.",
+            en: "Detailed 16% commission fee applied on item listing price for Non-Mall sellers across Shopee.",
+            th: "อัตราค่าธรรมเนียมคงที่ 16% สำหรับร้านค้าทั่วไปที่ไม่ใช่ Shopee Mall.",
+            ms: "Kadar komisen tetap 16% dikenakan ke atas harga produk bagi penjual bukan Mall.",
+            tl: "Detalyadong 16% commission fee sa presyo ng produkto para sa mga nagbebenta na hindi Mall."
+          }
+        },
+        {
+          url: "https://banhang.shopee.vn/edu/article/2139",
+          badge: "PAY",
+          badgeType: "pay",
+          source: { vi: "Shopee Học Viện Người Bán", en: "Shopee Seller Education", th: "Shopee Seller Education", ms: "Shopee Seller Education", tl: "Shopee Seller Education" },
+          title: {
+            vi: "Chính sách Phí Xử Lý Giao Dịch thanh toán đơn hàng",
+            en: "Payment & Transaction Processing Fee Policy",
+            th: "นโยบายค่าธรรมเนียมการประมวลผลธุรกรรมการชำระเงิน",
+            ms: "Dasar Yuran Pemprosesan Transaksi Pembayaran",
+            tl: "Patakaran sa Bayad sa Pagproseso ng Transaksyon sa Pagbabayad"
+          },
+          desc: {
+            vi: "Quy định mức phí thanh toán giao dịch 6% tính trên tổng giá trị thanh toán bao gồm tiền hàng và phí vận chuyển.",
+            en: "Rules on 6% transaction processing fee charged on total order amount including buyer payment and shipping.",
+            th: "การคิดค่าธรรมเนียมการชำระเงิน 6% จากยอดรวมที่ผู้ซื้อชำระทั้งหมดรวมค่าจัดส่ง.",
+            ms: "Peraturan yuran pemprosesan transaksi 6% ke atas jumlah bayaran pembeli termasuk penghantaran.",
+            tl: "Alituntunin sa processing fee sa kabuuang bayad kasama ang delivery."
+          }
+        },
+        {
+          url: "https://banhang.shopee.vn/edu/article/25223",
+          badge: "FEE",
+          badgeType: "fee",
+          source: { vi: "Shopee Học Viện Người Bán", en: "Shopee Seller Education", th: "Shopee Seller Education", ms: "Shopee Seller Education", tl: "Shopee Seller Education" },
+          title: {
+            vi: "Chính sách Phí Dịch Vụ Cố Định & Phí Hạ Tầng Sàn",
+            en: "Order Service & Platform Infrastructure Fixed Fee Policy",
+            th: "นโยบายค่าบริการและโครงสร้างพื้นฐานต่อคำสั่งซื้อ",
+            ms: "Dasar Yuran Perkhidmatan & Infrastruktur Platform Tetap",
+            tl: "Patakaran sa Fixed Fee para sa Platform Infrastructure"
+          },
+          desc: {
+            vi: "Quy định áp dụng mức phí cố định 3.000₫ trên mỗi sản phẩm/đơn hàng thành công phục vụ hạ tầng vận hành sàn.",
+            en: "Fixed 3,000₫ infrastructure fee applied per successful item/order to support platform operations.",
+            th: "ค่าธรรมเนียมโครงสร้างพื้นฐานคงที่ 3,000₫ ต่อสินค้าสำหรับบำรุงรักษาระบบ.",
+            ms: "Yuran infrastruktur tetap 3,000₫ setiap item bagi menyokong operasi platform.",
+            tl: "Nakatakdang 3,000₫ fixed fee bawat produkto para sa pagpapatakbo ng platform."
+          }
+        },
+        {
+          url: "https://banhang.shopee.vn/edu/article/2150",
+          badge: "XTRA",
+          badgeType: "xtra",
+          source: { vi: "Shopee Học Viện Người Bán", en: "Shopee Seller Education", th: "Shopee Seller Education", ms: "Shopee Seller Education", tl: "Shopee Seller Education" },
+          title: {
+            vi: "Biểu phí và quyền lợi Gói Dịch Vụ Freeship Xtra & Voucher Xtra",
+            en: "Freeship Xtra & Voucher Xtra Service Packages & Fee Caps",
+            th: "แพ็กเกจบริการ Freeship Xtra & Voucher Xtra และเพดานค่าบริการ",
+            ms: "Pakej Perkhidmatan Freeship Xtra & Baucar Xtra Serta Had Maksimum",
+            tl: "Mga Package ng Freeship Xtra & Voucher Xtra at Fee Caps"
+          },
+          desc: {
+            vi: "Chi tiết tỷ lệ phí dịch vụ cộng thêm 6% (mức trần tối đa 30.000₫/sản phẩm) cùng mã giảm giá tài trợ.",
+            en: "Fee terms for optional 6% service fee with 30,000₫ cap per product and sponsored promotional vouchers.",
+            th: "ค่าบริการเสริม 6% (เพดานสูงสุด 30,000₫ ต่อชิ้น) พร้อมโค้ดส่วนลดสนับสนุน.",
+            ms: "Kadar servis tambahan 6% (had 30,000₫ seunit) bersama baucar diskaun tajaan.",
+            tl: "Karagdagang 6% fee na may limitasyong 30,000₫ bawat item kasama ang sponsored vouchers."
+          }
+        },
+        {
+          url: "https://banhang.shopee.vn/edu/article/2579",
+          badge: "TAX",
+          badgeType: "tax",
+          source: { vi: "Shopee Trung Tâm Hỗ Trợ", en: "Shopee Help Center", th: "Shopee Help Center", ms: "Shopee Help Center", tl: "Shopee Help Center" },
+          title: {
+            vi: "Nghĩa vụ khấu trừ Thuế Giá Trị Gia Tăng (GTGT) & Thuế Thu Nhập Cá Nhân (TNCN)",
+            en: "VAT & Personal Income Tax (PIT) Withholding Regulations",
+            th: "ข้อกำหนดการหักภาษีมูลค่าเพิ่มและภาษีเงินได้บุคคลธรรมดา",
+            ms: "Peraturan Pemotongan Cukai Nilai Tambah & Cukai Pendapatan",
+            tl: "Mga Alituntunin sa Pagpigil ng VAT at Personal Income Tax"
+          },
+          desc: {
+            vi: "Quy định sàn TMĐT khấu trừ thuế trực tiếp: 1% GTGT và 0.5% TNCN trên doanh thu trước thuế của người bán cá nhân.",
+            en: "Tax withholding rules: 1% VAT and 0.5% PIT directly deducted on net sales before taxes for individual sellers.",
+            th: "การหักภาษี ณ ที่จ่าย: VAT 1% และ PIT 0.5% จากรายได้ก่อนหักภาษีสำหรับบุคคลธรรมดา.",
+            ms: "Potongan cukai: 1% VAT dan 0.5% cukai pendapatan daripada jualan sebelum cukai.",
+            tl: "Pagpigil ng buwis: 1% VAT at 0.5% PIT sa kita bago ang buwis para sa indibidwal."
+          }
+        },
+        {
+          url: "https://banhang.shopee.vn/edu/article/3648",
+          badge: "HUB",
+          badgeType: "hub",
+          source: { vi: "Shopee Trung Tâm Trợ Giúp", en: "Shopee Help Center", th: "Shopee Help Center", ms: "Shopee Help Center", tl: "Shopee Help Center" },
+          title: {
+            vi: "Tổng hợp tất cả các loại phí bán hàng cần biết trên Shopee",
+            en: "Comprehensive Guide to All Shopee Seller Fees",
+            th: "คู่มือสรุปค่าธรรมเนียมทั้งหมดสำหรับผู้ขายบน Shopee",
+            ms: "Panduan Lengkap Semua Yuran Penjual Shopee",
+            tl: "Komprehensibong Gabay sa Lahat ng Bayarin ng Nagbebenta sa Shopee"
+          },
+          desc: {
+            vi: "Bảng tổng hợp biểu phí đầy đủ, chu kỳ khấu trừ và cách theo dõi các khoản phí trên báo cáo tài chính.",
+            en: "Full breakdown of standard platform deductions, settlement schedules, and financial reporting.",
+            th: "ภาพรวมค่าธรรมเนียมมาตรฐาน รอบการหักเงิน และการตรวจสอบรายงานทางการเงิน.",
+            ms: "Pecahan potongan platform piawai, jadual penyelesaian, dan penyata kewangan.",
+            tl: "Buong breakdown ng mga karaniwang bawas, iskedyul, at ulat sa pananalapi."
+          }
+        },
+        {
+          url: "https://seller.vn.shopee.cn/edu/article/13123",
+          badge: "DOC",
+          badgeType: "doc",
+          source: { vi: "Shopee Seller Education Portal", en: "Shopee Seller Education Portal", th: "Shopee Seller Portal", ms: "Shopee Seller Portal", tl: "Shopee Seller Portal" },
+          title: {
+            vi: "Hướng dẫn đối soát doanh thu thực nhận và khấu trừ chiết khấu sàn",
+            en: "Reconciliation Guide for Net Payout & Seller Deductions",
+            th: "แนวทางการตรวจสอบยอดเงินโอนสุทธิและการหักค่าธรรมเนียม",
+            ms: "Panduan Penyesuaian Pendapatan Bersih & Potongan Penjual",
+            tl: "Gabay sa Pagtutugma ng Net Payout at Bawas ng Nagbebenta"
+          },
+          desc: {
+            vi: "Phương pháp kiểm tra số dư Ví Người Bán, đối chiếu khoản tiền thực nhận và tải hóa đơn phí dịch vụ điện tử.",
+            en: "How to audit Shopee Seller Balance, reconcile bank account payouts, and download e-tax invoices.",
+            th: "วิธีตรวจสอบยอดคงเหลือในกระเป๋าเงินผู้ขายและดาวน์โหลดใบกำกับภาษีอิเล็กทรอนิกส์.",
+            ms: "Cara menyemak baki dompet penjual dan memuat turun invois cukai elektronik.",
+            tl: "Paano suriin ang Seller Balance at mag-download ng e-tax invoices."
+          }
+        }
+      ],
+      th: [
+        {
+          url: "https://help.shopee.co.th/portal/4/article/77254",
+          badge: "EDU",
+          badgeType: "edu",
+          source: { vi: "Trung Tâm Trợ Giúp Shopee Thái Lan", en: "Shopee Help Center Thailand", th: "ศูนย์ช่วยเหลือ Shopee ประเทศไทย", ms: "Pusat Bantuan Shopee TH", tl: "Shopee Help Center TH" },
+          title: {
+            vi: "Biểu phí hoa hồng bán hàng Shopee Thái Lan (Commission Fee)",
+            en: "Shopee Thailand Marketplace Commission Fee Rates",
+            th: "รายละเอียดค่าธรรมเนียมการขายสำหรับผู้ขายในตลาด (Commission Fee)",
+            ms: "Kadar Yuran Komisen Pasaran Shopee Thailand",
+            tl: "Mga Rate ng Commission Fee sa Shopee Thailand"
+          },
+          desc: {
+            vi: "Cơ cấu phí hoa hồng người bán không thuộc Mall (4.28% - 5.35% đã gồm VAT) phân theo từng danh mục ngành hàng.",
+            en: "Detailed commission fee rates by product category (4.28% - 5.35% incl. VAT) for non-Mall marketplace sellers.",
+            th: "โครงสร้างอัตราค่าธรรมเนียมการขายสำหรับผู้ขายที่ไม่ใช่ Mall (4.28% - 5.35% รวม VAT) แบ่งตามหมวดหมู่.",
+            ms: "Kadar yuran komisen terkini mengikut kategori produk (4.28% - 5.35% termasuk VAT) bagi penjual pasaran.",
+            tl: "Mga rate ng komisyon ayon sa kategorya ng produkto (4.28% - 5.35% kasama ang VAT)."
+          }
+        },
+        {
+          url: "https://seller.shopee.co.th/edu/article/16022",
+          badge: "PAY",
+          badgeType: "pay",
+          source: { vi: "Shopee Học Viện Người Bán Thái Lan", en: "Shopee Seller Education TH", th: "ศูนย์การเรียนรู้ผู้ขาย Shopee TH", ms: "Shopee Seller Education TH", tl: "Shopee Seller Education TH" },
+          title: {
+            vi: "Chính sách Phí Xử Lý Giao Dịch Shopee Thái Lan (3.21%)",
+            en: "Transaction & Payment Processing Fee Terms (3.21%)",
+            th: "ข้อกำหนดค่าธรรมเนียมการทำธุรกรรมและการชำระเงิน (3.21%)",
+            ms: "Terma Yuran Pemprosesan Transaksi & Pembayaran (3.21%)",
+            tl: "Mga Tuntunin sa Transaction at Payment Processing Fee (3.21%)"
+          },
+          desc: {
+            vi: "Cách tính phí xử lý thanh toán 3.21% (đã gồm 7% VAT) trên tổng số tiền người mua chi trả bao gồm tiền hàng và vận chuyển.",
+            en: "Payment processing fee calculation of 3.21% (incl. 7% VAT) levied on total buyer order payments.",
+            th: "การคำนวณค่าธรรมเนียมการชำระเงิน 3.21% (รวม VAT 7%) จากยอดเงินรวมที่ผู้ซื้อชำระทั้งหมดต่อคำสั่งซื้อ.",
+            ms: "Pengiraan yuran pemprosesan pembayaran sebanyak 3.21% (termasuk 7% VAT) ke atas jumlah pesanan.",
+            tl: "Pagkalkula ng 3.21% bayad sa transaksyon (kasama ang 7% VAT) mula sa kabuuang bayad."
+          }
+        },
+        {
+          url: "https://seller.shopee.co.th/edu/article/18213",
+          badge: "XTRA",
+          badgeType: "xtra",
+          source: { vi: "Shopee Học Viện Người Bán Thái Lan", en: "Shopee Seller Education TH", th: "ศูนย์การเรียนรู้ผู้ขาย Shopee TH", ms: "Shopee Seller Education TH", tl: "Shopee Seller Education TH" },
+          title: {
+            vi: "Phí Dịch Vụ Gói Khuyến Mãi Freeship & Hoàn Xu Thái Lan",
+            en: "Service Fees for Special Marketing & Free Shipping Programs",
+            th: "ค่าบริการโปรแกรมพิเศษ: ร้านโค้ดคุ้ม ส่งฟรี และเงินคืน (Coin Cashback)",
+            ms: "Yuran Servis Pakej Pemasaran Khas & Penghantaran Percuma",
+            tl: "Mga Bayad sa Serbisyo para sa Free Shipping & Coin Cashback Programs"
+          },
+          desc: {
+            vi: "Quy định mức phí dịch vụ 5.35% có mức trần tối đa cho các gian hàng tham gia gói Freeship & Hoàn xu Shopee TH.",
+            en: "Fee terms and maximum caps for optional 5.35% marketing packages (Free Shipping & Coin Cashback).",
+            th: "เงื่อนไขและเพดานค่าบริการแพ็กเกจส่งเสริมการขายเพิ่มเติม 5.35% สำหรับร้านค้าที่เข้าร่วมโปรแกรมพิเศษ.",
+            ms: "Syarat dan had caj servis tambahan 5.35% bagi program penghantaran percuma dan pulangan syiling.",
+            tl: "Mga tuntunin at cap para sa 5.35% marketing packages (Free Shipping at Coin Cashback)."
+          }
+        },
+        {
+          url: "https://seller.shopee.co.th/edu/article/1368",
+          badge: "TAX",
+          badgeType: "tax",
+          source: { vi: "Shopee Trung Tâm Người Bán Thái Lan", en: "Shopee Seller Centre TH", th: "ศูนย์ผู้ขาย Shopee ประเทศไทย", ms: "Shopee Seller Centre TH", tl: "Shopee Seller Centre TH" },
+          title: {
+            vi: "Quy định Thuế Giá Trị Gia Tăng (VAT 7%) trên Phí Dịch Vụ Shopee TH",
+            en: "VAT (7%) Computation and e-Tax Invoices on Platform Fees",
+            th: "การคำนวณและใบกำกับภาษีมูลค่าเพิ่ม (VAT 7%) บนค่าธรรมเนียมแพลตฟอร์ม",
+            ms: "Pengiraan VAT (7%) dan Invois Cukai Elektronik ke atas Yuran",
+            tl: "Pagkalkula ng VAT (7%) at e-Tax Invoices sa Bayad ng Platform"
+          },
+          desc: {
+            vi: "Quy định tính 7% thuế GTGT trực tiếp trên các khoản phí sàn và tải hóa đơn thuế điện tử e-Tax Invoice.",
+            en: "Guidelines on 7% VAT applied to Shopee seller fees and downloading electronic tax invoices.",
+            th: "แนวทางการคิดภาษีมูลค่าเพิ่ม 7% บนค่าธรรมเนียมบริการของ Shopee และการดาวน์โหลดใบกำกับภาษีอิเล็กทรอนิกส์.",
+            ms: "Panduan mengenai 7% VAT yang dikenakan ke atas yuran perkhidmatan Shopee dan muat turun invois e-Tax.",
+            tl: "Alituntunin sa 7% VAT sa bayad ng Shopee at pag-download ng e-tax invoices."
+          }
+        },
+        {
+          url: "https://seller.th.shopee.cn/edu/article/23105",
+          badge: "DOC",
+          badgeType: "doc",
+          source: { vi: "Cổng Thông Tin Người Bán Shopee", en: "Shopee Seller Hub", th: "ศูนย์การเรียนรู้ Shopee TH Hub", ms: "Shopee Seller Hub", tl: "Shopee Seller Hub" },
+          title: {
+            vi: "Cẩm nang toàn diện về biểu phí và doanh thu thực nhận Shopee Thái Lan",
+            en: "Comprehensive Seller Fee and Net Remittance Guide for Thailand",
+            th: "คู่มือโครงสร้างค่าธรรมเนียมและยอดเงินโอนสุทธิของผู้ขาย Shopee ประเทศไทย",
+            ms: "Panduan Komprehensif Yuran Penjual dan Pindahan Bersih Thailand",
+            tl: "Komprehensibong Gabay sa Bayad at Net Remittance sa Thailand"
+          },
+          desc: {
+            vi: "Tổng hợp tất cả các khoản chiết khấu, kiểm tra đối soát tiền về tài khoản ngân hàng của người bán.",
+            en: "Complete overview of all platform expenses, escrow remittance verification, and profit calculations.",
+            th: "สรุปภาพรวมค่าใช้จ่ายทั้งหมด วิธีการตรวจสอบยอดเงินโอนเข้าบัญชี และการจัดการต้นทุนสำหรับร้านค้าออนไลน์.",
+            ms: "Gambaran keseluruhan perbelanjaan platform, pengesahan pindahan wang, dan anggaran keuntungan.",
+            tl: "Pangkalahatang-ideya ng mga gastusin, pag-verify ng remittance, at kalkulasyon ng tubo."
+          }
+        }
+      ],
+      my: [
+        {
+          url: "https://seller.shopee.com.my/edu/article/25269",
+          badge: "EDU",
+          badgeType: "edu",
+          source: { vi: "Học Viện Người Bán Shopee Malaysia", en: "Shopee Seller Education Malaysia", th: "Shopee Seller Education MY", ms: "Pusat Pembelajaran Penjual Shopee MY", tl: "Shopee Seller Education MY" },
+          title: {
+            vi: "Biểu phí hoa hồng bán hàng Shopee Malaysia (Commission Fee)",
+            en: "Marketplace Commission Fee Rates & Category Structure",
+            th: "โครงสร้างและอัตราค่าธรรมเนียมคอมมิชชัน Shopee Malaysia",
+            ms: "Struktur Kadar Yuran Komisen Pasaran Shopee Malaysia",
+            tl: "Mga Rate ng Commission Fee sa Shopee Malaysia"
+          },
+          desc: {
+            vi: "Biểu phí hoa hồng cố định phân theo danh mục sản phẩm dành cho người bán Non-Mall tại Malaysia.",
+            en: "Current commission fee rates by product category for non-Mall marketplace sellers on Shopee Malaysia.",
+            th: "อัตราค่าธรรมเนียมคอมมิชชันตามหมวดหมู่สินค้าสำหรับผู้ขายที่ไม่ใช่ Mall ในมาเลเซีย.",
+            ms: "Kadar yuran komisen terkini mengikut kategori produk bagi penjual pasaran bukan Mall di Shopee Malaysia.",
+            tl: "Mga kasalukuyang rate ng komisyon ayon sa kategorya para sa mga nagbebenta na hindi Mall."
+          }
+        },
+        {
+          url: "https://help.shopee.com.my/portal/4/article/188813",
+          badge: "PAY",
+          badgeType: "pay",
+          source: { vi: "Trung Tâm Hỗ Trợ Shopee Malaysia", en: "Shopee Help Center MY", th: "ศูนย์ช่วยเหลือ Shopee MY", ms: "Pusat Bantuan Shopee Malaysia", tl: "Shopee Help Center MY" },
+          title: {
+            vi: "Quy định Phí Xử Lý Giao Dịch Đơn Hàng Shopee Malaysia",
+            en: "Transaction Fee Calculation on Buyer Orders (3.78% - 4.24%)",
+            th: "การคำนวณค่าธรรมเนียมธุรกรรมและการชำระเงินของ Shopee MY",
+            ms: "Pengiraan Yuran Transaksi dan Gerbang Pembayaran Pesanan",
+            tl: "Pagkalkula ng Bayad sa Transaksyon sa mga Order sa Shopee MY"
+          },
+          desc: {
+            vi: "Cách tính phí xử lý giao dịch thanh toán trên tổng số tiền người mua chi trả bao gồm phí vận chuyển.",
+            en: "Rules on transaction processing fees charged on total order payments including shipping and buyer vouchers.",
+            th: "เกณฑ์การคิดค่าธรรมเนียมประมวลผลธุรกรรมจากยอดรวมที่ผู้ซื้อชำระทั้งหมด.",
+            ms: "Peraturan yuran pemprosesan transaksi yang dikenakan ke atas jumlah bayaran pembeli termasuk kos penghantaran.",
+            tl: "Mga tuntunin sa transaction fee na kinukuha mula sa kabuuang bayad kasama ang delivery."
+          }
+        },
+        {
+          url: "https://help.shopee.com.my/portal/4/article/143249",
+          badge: "XTRA",
+          badgeType: "xtra",
+          source: { vi: "Trung Tâm Hỗ Trợ Shopee Malaysia", en: "Shopee Help Center MY", th: "ศูนย์ช่วยเหลือ Shopee MY", ms: "Pusat Bantuan Shopee Malaysia", tl: "Shopee Help Center MY" },
+          title: {
+            vi: "Phí Dịch Vụ Chương Trình Freeship & Hoàn Xu Shopee Malaysia",
+            en: "Service Fees for RM15 Free Shipping & Coins Cashback Packages",
+            th: "ค่าบริการแพ็กเกจส่งฟรี RM15 และรับเงินคืน Coins Cashback",
+            ms: "Yuran Perkhidmatan untuk Program Penghantaran Percuma RM15 & Pulangan Syiling",
+            tl: "Mga Bayad sa Serbisyo para sa Free Shipping & Coins Cashback Packages"
+          },
+          desc: {
+            vi: "Tỷ lệ phí dịch vụ cộng thêm có mức trần cho các gian hàng tham gia gói Freeship và Hoàn xu tại Malaysia.",
+            en: "Capped service fee rates for sellers opted into Shopee special marketing and free shipping packages.",
+            th: "อัตราค่าบริการเพิ่มเติมพร้อมเพดานสูงสุดสำหรับร้านค้าที่เข้าร่วมโปรแกรมพิเศษในมาเลเซีย.",
+            ms: "Kadar yuran perkhidmatan tambahan dengan had maksimum bagi penjual yang menyertai program pemasaran Shopee.",
+            tl: "Mga limitadong rate ng service fee para sa mga nagbebenta na sumali sa promotional packages."
+          }
+        },
+        {
+          url: "https://seller.shopee.com.my/edu/article/5190",
+          badge: "TAX",
+          badgeType: "tax",
+          source: { vi: "Học Viện Người Bán Shopee Malaysia", en: "Shopee Seller Education Malaysia", th: "Shopee Seller Education MY", ms: "Pusat Pembelajaran Penjual Shopee MY", tl: "Shopee Seller Education MY" },
+          title: {
+            vi: "Chính sách Thuế Dịch Vụ (SST 8%) trên Phí Sàn Shopee Malaysia",
+            en: "Implementation of 8% Sales & Service Tax (SST) on Seller Fees",
+            th: "การบังคับใช้ภาษีการขายและบริการ (SST 8%) บนค่าธรรมเนียม Shopee",
+            ms: "Pelaksanaan Cukai Jualan dan Perkhidmatan (SST 8%) ke atas Yuran Platform",
+            tl: "Pagpapatupad ng 8% Sales & Service Tax (SST) sa mga Bayarin"
+          },
+          desc: {
+            vi: "Quy định áp dụng 8% thuế dịch vụ SST tính trên phí hoa hồng, phí giao dịch và phí gói dịch vụ.",
+            en: "Official guidelines on 8% SST charged on marketplace commission, transaction, and marketing service fees.",
+            th: "แนวทางอย่างเป็นทางการเกี่ยวกับการคิดภาษี SST 8% บนค่าธรรมเนียมแพลตฟอร์มทั้งหมด.",
+            ms: "Maklumat rasmi mengenai pengenaan 8% SST ke atas komisen, yuran transaksi dan yuran perkhidmatan Shopee.",
+            tl: "Opisyal na gabay sa 8% SST na ipinapataw sa komisyon, bayad sa transaksyon, at iba pa."
+          }
+        }
+      ],
+      ph: [
+        {
+          url: "https://seller.shopee.ph/edu/article/21077",
+          badge: "EDU",
+          badgeType: "edu",
+          source: { vi: "Học Viện Người Bán Shopee Philippines", en: "Shopee Seller Education Philippines", th: "Shopee Seller Education PH", ms: "Shopee Seller Education PH", tl: "Shopee Seller Education Philippines" },
+          title: {
+            vi: "Biểu phí hoa hồng bán hàng Shopee Philippines (Commission Fee)",
+            en: "Shopee Philippines Marketplace Commission Fee Matrix",
+            th: "โครงสร้างค่าธรรมเนียมคอมมิชชัน Shopee Philippines",
+            ms: "Struktur Yuran Komisen Pasaran Shopee Philippines",
+            tl: "Iskedyul ng Bayad sa Komisyon sa Marketplace ng Shopee Philippines"
+          },
+          desc: {
+            vi: "Bảng tỷ lệ phí hoa hồng (4% đến 5.6%) áp dụng cho người bán Non-Mall trên Shopee Philippines.",
+            en: "Overview of standard commission rates (4% to 5.6%) applicable to non-Mall seller orders across categories.",
+            th: "ภาพรวมอัตราค่าคอมมิชชันมาตรฐาน (4% ถึง 5.6%) สำหรับผู้ขายที่ไม่ใช่ Mall.",
+            ms: "Gambaran keseluruhan kadar komisen standard (4% hingga 5.6%) bagi penjual bukan Mall.",
+            tl: "Pangkalahatang-ideya ng mga rate ng komisyon (4% hanggang 5.6%) para sa mga nagbebenta na hindi Mall."
+          }
+        },
+        {
+          url: "https://seller.shopee.ph/edu/article/1504",
+          badge: "PAY",
+          badgeType: "pay",
+          source: { vi: "Học Viện Người Bán Shopee Philippines", en: "Shopee Seller Education Philippines", th: "Shopee Seller Education PH", ms: "Shopee Seller Education PH", tl: "Shopee Seller Education Philippines" },
+          title: {
+            vi: "Quy định Phí Xử Lý Giao Dịch Shopee Philippines (2.24%)",
+            en: "Computation of 2.24% Payment Processing & Transaction Fee",
+            th: "การคำนวณค่าธรรมเนียมธุรกรรม 2.24% ของ Shopee Philippines",
+            ms: "Pengiraan Yuran Pemprosesan Transaksi 2.24% Shopee PH",
+            tl: "Pagkalkula ng 2.24% na Bayad sa Pagproseso ng Transaksyon"
+          },
+          desc: {
+            vi: "Cách tính phí xử lý thanh toán 2.24% (đã gồm VAT) trên tổng số tiền người mua chi trả.",
+            en: "Explanation of the 2.24% payment processing fee (inclusive of VAT) levied on total buyer payments.",
+            th: "คำอธิบายเกี่ยวกับค่าธรรมเนียมการชำระเงิน 2.24% (รวม VAT) จากยอดชำระของผู้ซื้อทั้งหมด.",
+            ms: "Penerangan mengenai yuran pemprosesan pembayaran sebanyak 2.24% (termasuk VAT).",
+            tl: "Paliwanag sa 2.24% na bayad sa transaksyon (kasama ang VAT) na kinakalkula mula sa bayad ng mamimili."
+          }
+        },
+        {
+          url: "https://seller.shopee.ph/edu/article/3437",
+          badge: "XTRA",
+          badgeType: "xtra",
+          source: { vi: "Học Viện Người Bán Shopee Philippines", en: "Shopee Seller Education Philippines", th: "Shopee Seller Education PH", ms: "Shopee Seller Education PH", tl: "Shopee Seller Education Philippines" },
+          title: {
+            vi: "Phí Dịch Vụ Gói Khuyến Mãi Freeship & Hoàn Xu Philippines",
+            en: "Service Fees for Free Shipping Special & Coins Cashback Programs",
+            th: "ค่าบริการโปรแกรม Free Shipping Special และ Coins Cashback",
+            ms: "Yuran Servis Program Penghantaran Percuma Khas & Pulangan Syiling",
+            tl: "Mga Bayad sa Serbisyo para sa Free Shipping Special & Coins Cashback"
+          },
+          desc: {
+            vi: "Mức phí dịch vụ bổ sung có mức trần tối đa cho các gian hàng tham gia gói Freeship Special & Hoàn xu.",
+            en: "Service fee structure and maximum cap limits for sellers participating in Shopee promotional programs.",
+            th: "โครงสร้างค่าบริการและเพดานค่าใช้จ่ายสูงสุดสำหรับร้านค้าที่เข้าร่วมโปรแกรม.",
+            ms: "Struktur caj servis dan had maksimum bagi penjual yang menyertai program promosi Shopee.",
+            tl: "Istraktura ng bayad sa serbisyo na may pinakamataas na limitasyon para sa mga sumasali sa promotional packages."
+          }
+        },
+        {
+          url: "https://seller.shopee.ph/edu/article/27461",
+          badge: "TAX",
+          badgeType: "tax",
+          source: { vi: "Học Viện Người Bán Shopee Philippines", en: "Shopee Seller Education Philippines", th: "Shopee Seller Education PH", ms: "Shopee Seller Education PH", tl: "Shopee Seller Education Philippines" },
+          title: {
+            vi: "Quy định Khấu Trừ Thuế BIR Theo Thông Tư RR 16-2023 (Philippines)",
+            en: "BIR Revenue Regulation No. 16-2023 Withholding Tax Guidelines",
+            th: "แนวทางการหักภาษี ณ ที่จ่ายตามระเบียบ BIR RR 16-2023 ฟิลิปปินส์",
+            ms: "Garis Panduan Cukai Pegangan BIR RR No. 16-2023 Philippines",
+            tl: "Mga Alituntunin sa BIR Withholding Tax (RR Blg. 16-2023)"
+          },
+          desc: {
+            vi: "Hướng dẫn khấu trừ 1% thuế trên 50% doanh thu (tương đương 0.5% doanh thu gộp) theo quy định của cục thuế BIR.",
+            en: "Guidance on 1% withholding tax on 50% gross remittances (0.5% effective tax) required for e-commerce sellers.",
+            th: "ข้อกำหนดการหักภาษี 1% จาก 50% ของยอดเงินโอน (คิดเป็น 0.5% ของยอดรวม) ตามกฎหมาย BIR.",
+            ms: "Panduan pemotongan cukai 1% ke atas 50% kiriman kasar (cukai berkesan 0.5%) untuk penjual dalam talian.",
+            tl: "Gabay sa 1% withholding tax sa 50% kabuuang remittance (0.5% epektibong buwis) para sa mga online seller."
+          }
+        },
+        {
+          url: "https://seller.shopee.ph/edu/article/28201",
+          badge: "DOC",
+          badgeType: "doc",
+          source: { vi: "Học Viện Người Bán Shopee Philippines", en: "Shopee Seller Education Philippines", th: "Shopee Seller Education PH", ms: "Shopee Seller Education PH", tl: "Shopee Seller Education Philippines" },
+          title: {
+            vi: "Hướng dẫn Cấp Chứng Nhận Khấu Trừ Thuế BIR Form 2307",
+            en: "Issuance of BIR Form 2307 Tax Withholding Certificates",
+            th: "การออกหนังสือรับรองการหักภาษี ณ ที่จ่าย BIR Form 2307",
+            ms: "Pengeluaran Sijil Cukai Pegangan BIR Borang 2307",
+            tl: "Pag-isyu ng Sertipiko ng Buwis sa BIR Form 2307 sa Shopee"
+          },
+          desc: {
+            vi: "Cách người bán kiểm tra và tải chứng chỉ khấu trừ thuế BIR Form 2307 phục vụ quyết toán thuế thu nhập.",
+            en: "How registered sellers access and download BIR Form 2307 certificates for annual income tax filing.",
+            th: "วิธีที่ร้านค้าที่จดทะเบียนสามารถตรวจสอบและดาวน์โหลดเอกสาร BIR Form 2307 สำหรับยื่นภาษี.",
+            ms: "Cara penjual berdaftar mengakses dan memuat turun sijil BIR Borang 2307 untuk pelaporan cukai.",
+            tl: "Paano kumukuha at nagda-download ng BIR Form 2307 ang mga rehistradong nagbebenta para sa tax filing."
+          }
+        },
+        {
+          url: "https://help.shopee.ph/portal/10/article/174380",
+          badge: "HUB",
+          badgeType: "hub",
+          source: { vi: "Trung Tâm Hỗ Trợ Shopee Philippines", en: "Shopee Help Center Philippines", th: "ศูนย์ช่วยเหลือ Shopee PH", ms: "Pusat Bantuan Shopee PH", tl: "Shopee Help Center Philippines" },
+          title: {
+            vi: "Cẩm nang các loại phí và đối soát dòng tiền về Ví Người Bán",
+            en: "Comprehensive Guide to Seller Fees & Wallet Remittance Payouts",
+            th: "คู่มือค่าธรรมเนียมผู้ขายและการโอนเงินเข้ากระเป๋า Shopee PH",
+            ms: "Panduan Lengkap Yuran Penjual dan Pindahan Dana Dompet Shopee PH",
+            tl: "Kumpletong Gabay sa Bayarin ng Nagbebenta at Remittance sa Wallet"
+          },
+          desc: {
+            vi: "Quy trình khấu trừ chiết khấu sàn, giải phóng tiền ký quỹ và chuyển tiền tự động về tài khoản ngân hàng.",
+            en: "Step-by-step breakdown of seller deductions, escrow releases, and automated wallet disbursements.",
+            th: "ขั้นตอนการหักค่าธรรมเนียม การปล่อยเงินจากระบบ Escrow และการโอนเงินเข้าบัญชีธนาคาร.",
+            ms: "Pecahan langkah demi langkah pemotongan yuran, pelepasan escrow, dan pembayaran ke bank.",
+            tl: "Hakbang-hakbang na proseso ng mga bawas sa benta, escrow release, at pag-transfer sa bank account."
+          }
+        }
+      ]
+    };
+
     const ICON_SUN_SVG = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><line x1="12" y1="2" x2="12" y2="4.8"/><line x1="12" y1="19.2" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="6.91" y2="6.91"/><line x1="17.09" y1="17.09" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="4.8" y2="12"/><line x1="19.2" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="6.91" y2="17.09"/><line x1="17.09" y1="6.91" x2="19.07" y2="4.93"/></svg>`;
     const ICON_MOON_SVG = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
 
@@ -2875,13 +3644,16 @@ template = """<!DOCTYPE html>
     function openMarketScreen() {
       const calcApp = document.getElementById('calculatorApp');
       const switchBtn = document.getElementById('marketSwitchBtn');
+      const policyBtn = document.getElementById('policyDocBtn');
       const langBtn = document.getElementById('langBtn');
       const marketScreen = document.getElementById('marketScreen');
 
       // 1. Ẩn calculatorApp ngay lập tức trước khi thực hiện chuyển tab để triệt tiêu mọi hiệu ứng giao diện
       if (calcApp) calcApp.style.display = 'none';
       if (switchBtn) switchBtn.style.display = 'none';
+      if (policyBtn) policyBtn.style.display = 'none';
       if (langBtn) langBtn.style.display = 'none';
+      closePolicyModal();
 
       // 2. Chuyển tab về forward ngay trong lúc calculatorApp đang ẩn
       switchMode('forward');
@@ -2948,11 +3720,13 @@ template = """<!DOCTYPE html>
       const marketScreen = document.getElementById('marketScreen');
       const calcApp = document.getElementById('calculatorApp');
       const switchBtn = document.getElementById('marketSwitchBtn');
+      const policyBtn = document.getElementById('policyDocBtn');
       const langBtn = document.getElementById('langBtn');
 
       if (marketScreen) marketScreen.style.display = 'none';
       if (calcApp) calcApp.style.display = 'block';
       if (switchBtn) switchBtn.style.display = 'inline-flex';
+      if (policyBtn) policyBtn.style.display = 'inline-flex';
       if (langBtn) langBtn.style.display = 'inline-flex';
     }
 
@@ -2991,6 +3765,18 @@ template = """<!DOCTYPE html>
       if (displayEl) displayEl.innerText = `Shopee ${m.code}`;
       const switchBtn = document.getElementById('marketSwitchBtn');
       if (switchBtn) switchBtn.title = `${displayEl ? displayEl.innerText + ' - ' : ''}Đổi thị trường / Change marketplace`;
+
+      const pDocBtn = document.getElementById('policyDocBtn');
+      if (pDocBtn && I18N[lang] && I18N[lang].policyBtnTitle) {
+        pDocBtn.title = `${I18N[lang].policyBtnTitle} (${m.code})`;
+      }
+      const pBadge = document.getElementById('policyMarketBadge');
+      if (pBadge) pBadge.innerText = m.code;
+
+      const pModal = document.getElementById('policyModal');
+      if (pModal && pModal.classList.contains('show')) {
+        renderPolicyList();
+      }
 
       document.querySelectorAll('.market-card-btn').forEach(btn => btn.classList.remove('active'));
       const activeBtn = document.getElementById('mkt-' + marketKey);
@@ -3153,6 +3939,70 @@ template = """<!DOCTYPE html>
         setLanguage(currentLang === 'en' ? nativeLang : 'en');
       }
     }
+
+    // POLICY MODAL HANDLERS
+    function renderPolicyList() {
+      const m = MARKETS[currentMarket] || MARKETS.vn;
+      const container = document.getElementById('policyListContainer');
+      const badgeEl = document.getElementById('policyMarketBadge');
+      if (badgeEl) badgeEl.innerText = m.code;
+
+      const docs = POLICY_DOCS[currentMarket] || POLICY_DOCS.vn || [];
+      if (!container) return;
+
+      container.innerHTML = docs.map(item => {
+        const src = (item.source && (item.source[currentLang] || item.source.en || item.source.vi)) || 'Shopee';
+        const title = (item.title && (item.title[currentLang] || item.title.en || item.title.vi)) || '';
+        const desc = (item.desc && (item.desc[currentLang] || item.desc.en || item.desc.vi)) || '';
+        const bType = item.badgeType || 'edu';
+        const bText = item.badge || 'DOC';
+
+        return `
+          <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="policy-item">
+            <div class="policy-badge policy-badge-${bType}">${bText}</div>
+            <div class="policy-info">
+              <div class="policy-source policy-source-${bType}">${src}</div>
+              <div class="policy-title">${title}</div>
+              <div class="policy-desc">${desc}</div>
+            </div>
+            <div class="policy-icon-ext">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                <polyline points="15 3 21 3 21 9"/>
+                <line x1="10" y1="14" x2="21" y2="3"/>
+              </svg>
+            </div>
+          </a>
+        `;
+      }).join('');
+    }
+
+    function openPolicyModal() {
+      renderPolicyList();
+      const modal = document.getElementById('policyModal');
+      if (modal) {
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closePolicyModal() {
+      const modal = document.getElementById('policyModal');
+      if (modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+      }
+    }
+
+    function onPolicyBackdropClick(e) {
+      if (e.target.id === 'policyModal') {
+        closePolicyModal();
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closePolicyModal();
+    });
 
     // DOM ELEMENTS
     const priceInput = document.getElementById('priceInput');

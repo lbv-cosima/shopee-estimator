@@ -33,7 +33,8 @@ const requiredIds = [
   'step5CostSection', 'detailCostVal', 'detailProfitVal', 'detailMarginFormula', 'detailProfitRow',
   'formulaBeforeTax', 'formulaNet',
   'targetNetInput', 'clearReverseBtn', 'reversePresets', 'reverseDesc',
-  'requiredPrice', 'reverseSubtitle', 'reverseFormulaBody', 'toastBox'
+  'requiredPrice', 'reverseSubtitle', 'reverseFormulaBody', 'toastBox',
+  'policyDocBtn', 'policyModal', 'policyListContainer', 'policyMarketBadge'
 ];
 
 for (const id of requiredIds) {
@@ -215,15 +216,15 @@ vm.runInContext(scriptCode, context);
 
 // Trích xuất các hàm và cấu hình trực tiếp từ VM
 const exported = vm.runInContext(`({
-  MARKETS, I18N, setLanguage, selectMarket, openMarketScreen, applyMarket, toggleLang, setTheme,
+  MARKETS, I18N, POLICY_DOCS, setLanguage, selectMarket, openMarketScreen, applyMarket, toggleLang, setTheme,
   calculate, calculateReverse, parseInputNumber, formatMoney, formatMoneyWithSymbol, switchMode,
-  onToggleXtra, exportSummaryPng, resetAll
+  onToggleXtra, exportSummaryPng, resetAll, openPolicyModal, closePolicyModal, renderPolicyList
 })`, context);
 
 const {
-  MARKETS, I18N, setLanguage, selectMarket, openMarketScreen, applyMarket, toggleLang, setTheme,
+  MARKETS, I18N, POLICY_DOCS, setLanguage, selectMarket, openMarketScreen, applyMarket, toggleLang, setTheme,
   calculate, calculateReverse, parseInputNumber, formatMoney, formatMoneyWithSymbol, switchMode,
-  onToggleXtra, exportSummaryPng, resetAll
+  onToggleXtra, exportSummaryPng, resetAll, openPolicyModal, closePolicyModal, renderPolicyList
 } = exported;
 
 // Kiểm tra mọi key trong HTML đều có trong I18N ở cả 5 ngôn ngữ
@@ -578,9 +579,17 @@ console.log("\n[11] Kiểm tra PWA (Progressive Web App)...");
 const manifestPath = path.join(__dirname, 'manifest.json');
 assert(fs.existsSync(manifestPath), "manifest.json phải tồn tại!");
 const manifestJson = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-assert(manifestJson.name && manifestJson.short_name, "manifest.json phải có name và short_name!");
+assert.strictEqual(manifestJson.name, 'Shopee Estimator', "manifest.json name phải là 'Shopee Estimator'!");
+assert.strictEqual(manifestJson.short_name, 'Shopee Estimator', "manifest.json short_name phải là 'Shopee Estimator'!");
 assert.strictEqual(manifestJson.display, 'standalone', "manifest.json display phải là 'standalone'!");
 assert(manifestJson.icons && manifestJson.icons.length >= 2, "manifest.json phải có icons (192 và 512)!");
+
+// Kiểm tra tiêu đề trang web Shopee Estimator trên thẻ title và từ điển I18N
+assert(htmlContent.includes('<title id="htmlTitle">Shopee Estimator</title>'), "Thẻ title phải có nội dung 'Shopee Estimator'!");
+assert(htmlContent.includes('<meta name="apple-mobile-web-app-title" content="Shopee Estimator">'), "Thẻ meta apple-mobile-web-app-title phải là 'Shopee Estimator'!");
+for (const lang of ['vi', 'en', 'th', 'ms', 'tl']) {
+  assert.strictEqual(I18N[lang].pageTitle, 'Shopee Estimator', `pageTitle của ngôn ngữ ${lang} phải là 'Shopee Estimator'!`);
+}
 
 // Kiểm tra icon vuông trên đĩa
 const icon192Path = path.join(__dirname, 'assets', 'icon-192.png');
@@ -604,6 +613,115 @@ assert(htmlContent.includes('<meta name="theme-color"'), "index.html phải có 
 assert(htmlContent.includes('serviceWorker.register'), "index.html phải có mã đăng ký serviceWorker!");
 console.log("✓ index.html tích hợp đầy đủ thẻ meta PWA và đăng ký Service Worker.");
 
+// 12. Kiểm tra Policy Documents Modal (22 đường link chính thức 4 nước, icon đặt giữa home & lang, layout modal danh sách)
+console.log("\n[12] Kiểm tra Policy Documents Modal & 22 đường link chính sách chính thức...");
+
+// Kiểm tra vị trí của icon policyDocBtn: phải nằm giữa marketSwitchBtn và langBtn
+const posMarketSwitch = htmlContent.indexOf('id="marketSwitchBtn"');
+const posPolicyDoc = htmlContent.indexOf('id="policyDocBtn"');
+const posLang = htmlContent.indexOf('id="langBtn"');
+assert(posMarketSwitch !== -1 && posPolicyDoc !== -1 && posLang !== -1, "Thiếu một trong ba nút trên top-bar!");
+assert(posMarketSwitch < posPolicyDoc && posPolicyDoc < posLang, "Nút policyDocBtn phải nằm ở giữa marketSwitchBtn và langBtn theo đúng thứ tự!");
+
+// Kiểm tra SVG icon tài liệu gấp góc (Ảnh 1)
+assert(htmlContent.includes('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>'), "Nút policyDocBtn phải chứa SVG icon tài liệu gấp góc chuẩn xác!");
+assert(htmlContent.includes('<polyline points="14 2 14 8 20 8"/>'), "Nút policyDocBtn phải có nếp gấp góc tài liệu!");
+
+// Kiểm tra các class và cấu trúc modal dạng Ảnh 2
+assert(htmlContent.includes('class="policy-modal-backdrop"'), "Phải có modal backdrop cho policy modal!");
+assert(htmlContent.includes('class="policy-modal-card"'), "Phải có modal card cho policy modal!");
+assert(htmlContent.includes('class="policy-dot"'), "Phải có chấm xanh trạng thái trên header modal (Ảnh 2)!");
+assert(htmlContent.includes('class="policy-modal-title"'), "Phải có tiêu đề modal!");
+assert(htmlContent.includes('id="policyMarketBadge"'), "Phải có badge thị trường tương ứng!");
+assert(htmlContent.includes('class="policy-close-x"'), "Phải có nút đóng ✕!");
+assert(htmlContent.includes('class="policy-footer-note"'), "Phải có dòng chú thích nguồn Shopee chính thức ở footer!");
+assert(htmlContent.includes('class="policy-footer-btn"'), "Phải có nút đóng ở footer modal!");
+
+// Kiểm tra từ điển đa ngôn ngữ cho policy modal
+const policyKeys = ['policyBtnTitle', 'policyModalTitle', 'policyFooterNote', 'policyCloseBtn'];
+for (const lang of ['vi', 'en', 'th', 'ms', 'tl']) {
+  for (const pk of policyKeys) {
+    assert(I18N[lang][pk], `I18N.${lang} thiếu key ${pk}!`);
+  }
+}
+
+// Kiểm tra cơ sở dữ liệu POLICY_DOCS
+assert(POLICY_DOCS && typeof POLICY_DOCS === 'object', "POLICY_DOCS phải tồn tại!");
+const marketsList = ['vn', 'th', 'my', 'ph'];
+const expectedCounts = { vn: 7, th: 5, my: 4, ph: 6 };
+
+// Danh sách 22 link chính thức mà người dùng cung cấp
+const expectedLinks = {
+  vn: [
+    'https://banhang.shopee.vn/edu/article/251',
+    'https://banhang.shopee.vn/edu/article/2139',
+    'https://banhang.shopee.vn/edu/article/25223',
+    'https://banhang.shopee.vn/edu/article/2150',
+    'https://banhang.shopee.vn/edu/article/2579',
+    'https://banhang.shopee.vn/edu/article/3648',
+    'https://seller.vn.shopee.cn/edu/article/13123'
+  ],
+  th: [
+    'https://help.shopee.co.th/portal/4/article/77254',
+    'https://seller.shopee.co.th/edu/article/16022',
+    'https://seller.shopee.co.th/edu/article/18213',
+    'https://seller.shopee.co.th/edu/article/1368',
+    'https://seller.th.shopee.cn/edu/article/23105'
+  ],
+  my: [
+    'https://seller.shopee.com.my/edu/article/25269',
+    'https://help.shopee.com.my/portal/4/article/188813',
+    'https://help.shopee.com.my/portal/4/article/143249',
+    'https://seller.shopee.com.my/edu/article/5190'
+  ],
+  ph: [
+    'https://seller.shopee.ph/edu/article/21077',
+    'https://seller.shopee.ph/edu/article/1504',
+    'https://seller.shopee.ph/edu/article/3437',
+    'https://seller.shopee.ph/edu/article/27461',
+    'https://seller.shopee.ph/edu/article/28201',
+    'https://help.shopee.ph/portal/10/article/174380'
+  ]
+};
+
+let totalDocsCount = 0;
+for (const mkt of marketsList) {
+  assert(Array.isArray(POLICY_DOCS[mkt]), `POLICY_DOCS.${mkt} phải là mảng!`);
+  assert.strictEqual(POLICY_DOCS[mkt].length, expectedCounts[mkt], `Số lượng tài liệu của ${mkt} phải là ${expectedCounts[mkt]}!`);
+  totalDocsCount += POLICY_DOCS[mkt].length;
+
+  const actualUrls = POLICY_DOCS[mkt].map(d => d.url);
+  for (const expUrl of expectedLinks[mkt]) {
+    assert(actualUrls.includes(expUrl), `Thị trường ${mkt} thiếu URL chính thức: ${expUrl}`);
+  }
+
+  // Kiểm tra từng item có đủ badge, badgeType, source, title, desc
+  for (const doc of POLICY_DOCS[mkt]) {
+    assert(doc.url && doc.url.startsWith('https://'), `URL không hợp lệ: ${doc.url}`);
+    assert(doc.badge, `Thiếu badge cho ${doc.url}`);
+    assert(doc.badgeType, `Thiếu badgeType cho ${doc.url}`);
+    assert(doc.source && doc.source.vi && doc.source.en, `Thiếu source cho ${doc.url}`);
+    assert(doc.title && doc.title.vi && doc.title.en, `Thiếu title cho ${doc.url}`);
+    assert(doc.desc && doc.desc.vi && doc.desc.en, `Thiếu desc cho ${doc.url}`);
+  }
+}
+assert.strictEqual(totalDocsCount, 22, "Tổng cộng phải có đủ 22 liên kết tài liệu chính sách đã lọc!");
+
+// Kiểm tra tương tác mở và đóng modal
+selectMarket('vn');
+openPolicyModal();
+const pModalEl = documentMock.getElementById('policyModal');
+assert(pModalEl.classList.contains('show'), "Modal phải có class 'show' khi mở!");
+const pContainerEl = documentMock.getElementById('policyListContainer');
+assert(pContainerEl.innerHTML.includes('policy-item'), "Container phải được render danh sách các liên kết chính sách!");
+assert(pContainerEl.innerHTML.includes('https://banhang.shopee.vn/edu/article/251'), "Phải có link chính thức trong HTML render!");
+
+closePolicyModal();
+assert(!pModalEl.classList.contains('show'), "Modal phải bỏ class 'show' khi đóng!");
+
+console.log("✓ Icon tài liệu đặt chuẩn giữa Home & Lang; Modal hiển thị chuẩn Ảnh 2 với đầy đủ 22 URL chính sách phân loại cho 4 thị trường.");
+
 console.log("\n==================================================================");
-console.log("=== TẤT CẢ 11 HẠNG MỤC KIỂM THỬ ĐÃ VƯỢT QUA 100% THÀNH CÔNG! ===");
+console.log("=== TẤT CẢ 12 HẠNG MỤC KIỂM THỬ ĐÃ VƯỢT QUA 100% THÀNH CÔNG! ===");
 console.log("==================================================================");
+
